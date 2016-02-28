@@ -3,7 +3,7 @@ __Bitmap offscreen drawing in Swift for OS X__
 
 __Description__
 
-A clear and simple API over a CoreGraphics bitmap context.  
+A clear, simple and concise API over a CoreGraphics bitmap context.  
 Loosely inspired by the ImageDraw Python library.  
 Especially useful for [data visualizations](https://github.com/nst/DevTeamActivity).
 
@@ -62,7 +62,7 @@ b.rectangle(R(10,10,20,10),
 
 <TR>
     <TD><IMG SRC="img/bitmap_text.png" /></TD>
-    <TD><PRE>b.text("hello", P(10,10))
+    <TD><PRE>b.text("hi", P(10,10))
     
 b.text("hello", P(40,30),
     rotationDegrees: -90,
