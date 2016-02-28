@@ -20,10 +20,10 @@ __Examples__
 
 <TR>
     <TD><IMG SRC="img/bitmap.png" width="192" /></TD>
-    <TD><PRE>// let b = Bitmap(32, 32)
+    <TD><PRE>// let b = BitmapCanvas(32, 32)
 
 let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-let b = Bitmap(32, 32, backgroundColor: color)
+let b = BitmapCanvas(32, 32, backgroundColor: color)
 </PRE>
     </TD>
 </TR>
