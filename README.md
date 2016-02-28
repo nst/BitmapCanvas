@@ -19,7 +19,7 @@ __Examples__
 <TABLE>
 
 <TR>
-    <TD><IMG SRC="img/bitmap.png" /></TD>
+    <TD><IMG SRC="img/bitmap.png" width="192" /></TD>
     <TD><PRE>// let b = Bitmap(32, 32)
 
 let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
@@ -52,7 +52,9 @@ b.lineVertical(P(20, 1), height: 19, color: NSColor.blueColor())</PRE>
     <TD><IMG SRC="img/bitmap_rects.png" /></TD>
     <TD><PRE>b.rectangle(R(5,5,20,10))
 
-b.rectangle(R(10,10,20,10), strokeColor: NSColor.blueColor(), fillColor: NSColor.magentaColor())</PRE>
+b.rectangle(R(10,10,20,10),
+    strokeColor: NSColor.blueColor(),
+    fillColor: NSColor.magentaColor())</PRE>
     </TD>
 </TR>
 
