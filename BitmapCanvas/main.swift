@@ -11,7 +11,11 @@ import AppKit
 
 func test() {
     
-    let b = BitmapCanvas(640, 480)
+    var b = BitmapCanvas(640, 480)
+
+    b[0,0] = NSColor.redColor()
+    b[1,0] = NSColor.greenColor()
+    b[2,0] = NSColor.blueColor()
     
     b.setAllowsAntialiasing(false)
     
@@ -58,17 +62,17 @@ func test() {
     
     b.rectangle(R(3,3,3,3), strokeColor:NSColor.blueColor())
     
-    b.point(P(0,0), color:NSColor.cyanColor())
-    
-    b.point(P(1,1), color:NSColor.redColor())
-    b.point(P(2,2), color:NSColor.greenColor())
-    b.point(P(3,3), color:NSColor.yellowColor())
+    b[0,0] = NSColor.cyanColor()
+
+    b[1,1] = NSColor.redColor()
+    b[2,2] = NSColor.greenColor()
+    b[3,3] = NSColor.yellowColor()
     
     b.setAllowsAntialiasing(true)
     
-    b.point(P(6,1), color:NSColor.redColor())
-    b.point(P(7,2), color:NSColor.greenColor())
-    b.point(P(8,3), color:NSColor.yellowColor())
+    b[6,1] = NSColor.redColor()
+    b[7,2] = NSColor.greenColor()
+    b[8,3] = NSColor.yellowColor()
     
     b.rectangle(R(8,3,3,3), strokeColor:NSColor.blueColor())
     
@@ -90,14 +94,14 @@ func bitmap() {
 
 func points() {
     
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-    let b = BitmapCanvas(32, 32, backgroundColor: color)
+    let color = NSColor(deviceWhite: 0.95, alpha: 1.0).colorUsingColorSpaceName(NSDeviceRGBColorSpace)
+    var b = BitmapCanvas(32, 32, backgroundColor: color)
     
-    b.point(P(1,1))
-    
-    b.point(P(1,3), color: NSColor.redColor())
-    b.point(P(2,3), color: NSColor.greenColor())
-    b.point(P(3,3), color: NSColor.blueColor())
+    b[1,1] = NSColor.blackColor()
+
+    b[1,3] = NSColor.redColor()
+    b[2,3] = NSColor.greenColor()
+    b[3,3] = NSColor.blueColor()
     
     b.save("/tmp/bitmap_points.png")
 }

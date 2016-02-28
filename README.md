@@ -30,11 +30,13 @@ let b = BitmapCanvas(32, 32, backgroundColor: color)
 
 <TR>
     <TD><IMG SRC="img/bitmap_points.png" /></TD>
-    <TD><PRE>b.point(P(1,1))
+<TD><PRE>var b = BitmapCanvas(32, 32)
 
-b.point(P(1,3), color: NSColor.redColor())
-b.point(P(2,3), color: NSColor.greenColor())
-b.point(P(3,3), color: NSColor.blueColor())</PRE>
+b[1,1] = NSColor.blackColor()
+
+b[1,3] = NSColor.redColor()
+b[2,3] = NSColor.greenColor()
+b[3,3] = NSColor.blueColor()</PRE>
     </TD>
 </TR>
 

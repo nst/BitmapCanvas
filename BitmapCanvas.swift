@@ -91,7 +91,8 @@ struct BitmapCanvas {
     
     init(_ width:Int, _ height:Int, backgroundColor:NSColor? = nil) {
         
-        self.bitmapImageRep = NSBitmapImageRep(bitmapDataPlanes:nil,
+        self.bitmapImageRep = NSBitmapImageRep(
+            bitmapDataPlanes:nil,
             pixelsWide:width,
             pixelsHigh:height,
             bitsPerSample:8,
@@ -99,8 +100,8 @@ struct BitmapCanvas {
             hasAlpha:true,
             isPlanar:false,
             colorSpaceName:NSDeviceRGBColorSpace,
-            bytesPerRow:0,
-            bitsPerPixel:0)!
+            bytesPerRow:width*4,
+            bitsPerPixel:32)!
         
         self.context = NSGraphicsContext(bitmapImageRep: bitmapImageRep)!
         
@@ -118,9 +119,45 @@ struct BitmapCanvas {
         CGContextScaleCTM(cgContext, 1.0, -1.0)
     }
     
-    func point(p:NSPoint, color:NSColor? = nil) {
-        lineHorizontal(p, width: 1, color: color)
+    subscript(x:Int, y:Int) -> NSColor {
+        
+        get {
+            let data = CGBitmapContextGetData(cgContext)
+            let dataType = UnsafePointer<UInt8>(data)
+            let offset = 4 * ((Int(self.width) * Int(y)) + Int(x))
+            
+            let r = dataType[offset]
+            let g = dataType[offset+1]
+            let b = dataType[offset+2]
+            let a = dataType[offset+3]
+            
+            return NSColor(
+                calibratedRed: CGFloat(Double(r)/255.0),
+                green: CGFloat(Double(g)/255.0),
+                blue: CGFloat(Double(b)/255.0),
+                alpha: CGFloat(Double(a)/255.0))
+        }
+        
+        set {
+            let data = CGBitmapContextGetData(cgContext)
+            let dataType = UnsafeMutablePointer<UInt8>(data)
+            let offset = 4 * ((Int(self.width) * Int(y)) + Int(x))
+            
+            guard let normalizedColor = newValue.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
+                print("-- cannot normalize color \(newValue)")
+                return
+            }
+            
+            dataType[offset] = UInt8(normalizedColor.redComponent * 255.0)
+            dataType[offset+1] = UInt8(normalizedColor.greenComponent * 255.0)
+            dataType[offset+2] = UInt8(normalizedColor.blueComponent * 255.0)
+            dataType[offset+3] = UInt8(normalizedColor.alphaComponent * 255.0)
+        }
     }
+    
+//    func point(p:NSPoint, color:NSColor? = nil) {
+//        lineHorizontal(p, width: 1, color: color)
+//    }
     
     func line(p1:NSPoint, _ p2:NSPoint, color:NSColor? = NSColor.blackColor()) {
         context.saveGraphicsState()
