@@ -119,16 +119,14 @@ struct BitmapCanvas {
         CGContextScaleCTM(cgContext, 1.0, -1.0)
     }
     
-    func pointColor(p:NSPoint) -> NSColor {
+    private func _pointColor(p:NSPoint, pixelBuffer:UnsafePointer<UInt8>) -> NSColor {
         
-        let data = CGBitmapContextGetData(cgContext)
-        let dataType = UnsafePointer<UInt8>(data)
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
         
-        let r = dataType[offset]
-        let g = dataType[offset+1]
-        let b = dataType[offset+2]
-        let a = dataType[offset+3]
+        let r = pixelBuffer[offset]
+        let g = pixelBuffer[offset+1]
+        let b = pixelBuffer[offset+2]
+        let a = pixelBuffer[offset+3]
         
         return NSColor(
             calibratedRed: CGFloat(Double(r)/255.0),
@@ -137,20 +135,31 @@ struct BitmapCanvas {
             alpha: CGFloat(Double(a)/255.0))
     }
     
-    func setPointColor(p:NSPoint, color:NSColor) {
-        let data = CGBitmapContextGetData(cgContext)
-        let dataType = UnsafeMutablePointer<UInt8>(data)
+    func pointColor(p:NSPoint) -> NSColor {
+        
+        let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
+        
+        return _pointColor(p, pixelBuffer:pixelBuffer)
+    }
+    
+    private func _setPointColor(p:NSPoint, pixelBuffer:UnsafeMutablePointer<UInt8>, normalizedColor:NSColor) {
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
         
+        pixelBuffer[offset] = UInt8(normalizedColor.redComponent * 255.0)
+        pixelBuffer[offset+1] = UInt8(normalizedColor.greenComponent * 255.0)
+        pixelBuffer[offset+2] = UInt8(normalizedColor.blueComponent * 255.0)
+        pixelBuffer[offset+3] = UInt8(normalizedColor.alphaComponent * 255.0)
+    }
+    
+    func setPointColor(p:NSPoint, color:NSColor) {
         guard let normalizedColor = color.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
             print("-- cannot normalize color \(color)")
             return
         }
         
-        dataType[offset] = UInt8(normalizedColor.redComponent * 255.0)
-        dataType[offset+1] = UInt8(normalizedColor.greenComponent * 255.0)
-        dataType[offset+2] = UInt8(normalizedColor.blueComponent * 255.0)
-        dataType[offset+3] = UInt8(normalizedColor.alphaComponent * 255.0)
+        let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
+        
+        _setPointColor(p, pixelBuffer:pixelBuffer, normalizedColor:normalizedColor)
     }
     
     subscript(x:Int, y:Int) -> NSColor {
@@ -169,18 +178,24 @@ struct BitmapCanvas {
     func fill(p:NSPoint, color newColor:NSColor) {
         // floodFillScanlineStack from http://lodev.org/cgtutor/floodfill.html
         
-        let oldColor = pointColor(p)
+        let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
+        
+        let oldColor = _pointColor(p, pixelBuffer:pixelBuffer)
         
         if oldColor == newColor { return }
-
+        
+        guard let newColorNormalized = newColor.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
+            print("-- cannot normalize color \(newColor)")
+            return
+        }
+        
         var stack : [NSPoint] = [p]
-//        var maxStackCount = 0
         
         while let pp = stack.popLast() {
             
             var x1 = pp.x
             
-            while(x1 >= 0 && pointColor(P(x1, pp.y)) == oldColor) {
+            while(x1 >= 0 && _pointColor(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor) {
                 x1--
             }
             
@@ -189,33 +204,28 @@ struct BitmapCanvas {
             var spanAbove = false
             var spanBelow = false
             
-            while(x1 < width && pointColor(P(x1, pp.y)) == oldColor ) {
+            while(x1 < width && _pointColor(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor ) {
                 
-                setPointColor(P(x1, pp.y), color:newColor)
- 
+                _setPointColor(P(x1, pp.y), pixelBuffer:pixelBuffer, normalizedColor:newColorNormalized)
+                
                 let north = P(x1, pp.y-1)
                 let south = P(x1, pp.y+1)
                 
-                if spanAbove == false && pp.y > 0 && pointColor(north) == oldColor {
+                if spanAbove == false && pp.y > 0 && _pointColor(north, pixelBuffer:pixelBuffer) == oldColor {
                     stack.append(north)
                     spanAbove = true
-                } else if spanAbove && pp.y > 0 && pointColor(north) != oldColor {
+                } else if spanAbove && pp.y > 0 && _pointColor(north, pixelBuffer:pixelBuffer) != oldColor {
                     spanAbove = false
-                } else if spanBelow == false && pp.y < height - 1 && pointColor(south) == oldColor {
+                } else if spanBelow == false && pp.y < height - 1 && _pointColor(south, pixelBuffer:pixelBuffer) == oldColor {
                     stack.append(south)
                     spanBelow = true
-                } else if spanBelow && pp.y < height - 1 && pointColor(south) != oldColor {
+                } else if spanBelow && pp.y < height - 1 && _pointColor(south, pixelBuffer:pixelBuffer) != oldColor {
                     spanBelow = false
                 }
                 
                 x1++
-                
-//                maxStackCount = max(maxStackCount, stack.count)
             }
         }
-
-//        print(maxStackCount)
-
     }
     
     func line(p1:NSPoint, _ p2:NSPoint, color:NSColor? = NSColor.blackColor()) {
