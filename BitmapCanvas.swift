@@ -178,6 +178,9 @@ struct BitmapCanvas {
     func fill(p:NSPoint, color newColor:NSColor) {
         // floodFillScanlineStack from http://lodev.org/cgtutor/floodfill.html
         
+        assert(p.x < width, "p.x \(p.x) out of range, must be < \(width)")
+        assert(p.y < height, "p.y \(p.y) out of range, must be < \(height)")
+        
         let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
         
         let oldColor = _pointColor(p, pixelBuffer:pixelBuffer)
