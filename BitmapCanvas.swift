@@ -119,45 +119,109 @@ struct BitmapCanvas {
         CGContextScaleCTM(cgContext, 1.0, -1.0)
     }
     
+    func pointColor(p:NSPoint) -> NSColor {
+        
+        let data = CGBitmapContextGetData(cgContext)
+        let dataType = UnsafePointer<UInt8>(data)
+        let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
+        
+        let r = dataType[offset]
+        let g = dataType[offset+1]
+        let b = dataType[offset+2]
+        let a = dataType[offset+3]
+        
+        return NSColor(
+            calibratedRed: CGFloat(Double(r)/255.0),
+            green: CGFloat(Double(g)/255.0),
+            blue: CGFloat(Double(b)/255.0),
+            alpha: CGFloat(Double(a)/255.0))
+    }
+    
+    func setPointColor(p:NSPoint, color:NSColor) {
+        let data = CGBitmapContextGetData(cgContext)
+        let dataType = UnsafeMutablePointer<UInt8>(data)
+        let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
+        
+        guard let normalizedColor = color.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
+            print("-- cannot normalize color \(color)")
+            return
+        }
+        
+        dataType[offset] = UInt8(normalizedColor.redComponent * 255.0)
+        dataType[offset+1] = UInt8(normalizedColor.greenComponent * 255.0)
+        dataType[offset+2] = UInt8(normalizedColor.blueComponent * 255.0)
+        dataType[offset+3] = UInt8(normalizedColor.alphaComponent * 255.0)
+    }
+    
     subscript(x:Int, y:Int) -> NSColor {
         
         get {
-            let data = CGBitmapContextGetData(cgContext)
-            let dataType = UnsafePointer<UInt8>(data)
-            let offset = 4 * ((Int(self.width) * Int(y)) + Int(x))
-            
-            let r = dataType[offset]
-            let g = dataType[offset+1]
-            let b = dataType[offset+2]
-            let a = dataType[offset+3]
-            
-            return NSColor(
-                calibratedRed: CGFloat(Double(r)/255.0),
-                green: CGFloat(Double(g)/255.0),
-                blue: CGFloat(Double(b)/255.0),
-                alpha: CGFloat(Double(a)/255.0))
+            let p = P(CGFloat(x),CGFloat(y))
+            return pointColor(p)
         }
         
         set {
-            let data = CGBitmapContextGetData(cgContext)
-            let dataType = UnsafeMutablePointer<UInt8>(data)
-            let offset = 4 * ((Int(self.width) * Int(y)) + Int(x))
-            
-            guard let normalizedColor = newValue.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
-                print("-- cannot normalize color \(newValue)")
-                return
-            }
-            
-            dataType[offset] = UInt8(normalizedColor.redComponent * 255.0)
-            dataType[offset+1] = UInt8(normalizedColor.greenComponent * 255.0)
-            dataType[offset+2] = UInt8(normalizedColor.blueComponent * 255.0)
-            dataType[offset+3] = UInt8(normalizedColor.alphaComponent * 255.0)
+            let p = P(CGFloat(x),CGFloat(y))
+            setPointColor(p, color:newValue)
         }
     }
     
-//    func point(p:NSPoint, color:NSColor? = nil) {
-//        lineHorizontal(p, width: 1, color: color)
-//    }
+    enum Direction {
+        case North
+        case West
+        case South
+        case East
+    }
+    
+    func neighbour(p:NSPoint, direction:Direction) -> NSPoint? {
+        if p.x == 0 && direction == .East { return nil }
+        if p.x == self.width-1 && direction == .West { return nil }
+        if p.y == 0 && direction == .North { return nil }
+        if p.y == self.height-1 && direction == .South { return nil }
+        
+        switch direction {
+        case .North: return P(p.x, p.y-1)
+        case .West: return P(p.x+1, p.y)
+        case .South: return P(p.x, p.y+1)
+        case .East: return P(p.x-1, p.y)
+        }
+    }
+    
+    func fill(p:NSPoint, color fillColor:NSColor) {
+        
+        let startPointColor = pointColor(p)
+        
+        if startPointColor == fillColor { return }
+        
+        var processed = Array(count:Int(width) * Int(height), repeatedValue:false)
+        
+        var queue : [NSPoint] = [p]
+        
+        var loops = 0
+        
+        while queue.isEmpty == false {
+            
+            let pp = queue.removeFirst()
+            
+            if pointColor(pp) != startPointColor { continue }
+            
+            setPointColor(pp, color: fillColor)
+            processed[Int(width) * Int(pp.y) + Int(pp.x)] = true
+            
+            if let ppp = neighbour(pp, direction: .West) where processed[Int(width) * Int(ppp.y) + Int(ppp.x)] == false { queue.append(ppp) }
+            if let ppp = neighbour(pp, direction: .East) where processed[Int(width) * Int(ppp.y) + Int(ppp.x)] == false { queue.append(ppp) }
+            if let ppp = neighbour(pp, direction: .North) where processed[Int(width) * Int(ppp.y) + Int(ppp.x)] == false { queue.append(ppp) }
+            if let ppp = neighbour(pp, direction: .South) where processed[Int(width) * Int(ppp.y) + Int(ppp.x)] == false { queue.append(ppp) }
+            
+            loops += 1
+            
+            //            if loops > 50000 {
+            //                break
+            //            }
+            
+        }
+        
+    }
     
     func line(p1:NSPoint, _ p2:NSPoint, color:NSColor? = NSColor.blackColor()) {
         context.saveGraphicsState()
