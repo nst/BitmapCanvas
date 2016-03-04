@@ -119,7 +119,7 @@ struct BitmapCanvas {
         CGContextScaleCTM(cgContext, 1.0, -1.0)
     }
     
-    private func _pointColor(p:NSPoint, pixelBuffer:UnsafePointer<UInt8>) -> NSColor {
+    private func _color(p:NSPoint, pixelBuffer:UnsafePointer<UInt8>) -> NSColor {
         
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
         
@@ -135,14 +135,14 @@ struct BitmapCanvas {
             alpha: CGFloat(Double(a)/255.0))
     }
     
-    func pointColor(p:NSPoint) -> NSColor {
+    func color(p:NSPoint) -> NSColor {
         
         let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
         
-        return _pointColor(p, pixelBuffer:pixelBuffer)
+        return _color(p, pixelBuffer:pixelBuffer)
     }
     
-    private func _setPointColor(p:NSPoint, pixelBuffer:UnsafeMutablePointer<UInt8>, normalizedColor:NSColor) {
+    private func _setColor(p:NSPoint, pixelBuffer:UnsafeMutablePointer<UInt8>, normalizedColor:NSColor) {
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
         
         pixelBuffer[offset] = UInt8(normalizedColor.redComponent * 255.0)
@@ -151,7 +151,7 @@ struct BitmapCanvas {
         pixelBuffer[offset+3] = UInt8(normalizedColor.alphaComponent * 255.0)
     }
     
-    func setPointColor(p:NSPoint, color:NSColor) {
+    func setColor(p:NSPoint, color:NSColor) {
         guard let normalizedColor = color.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
             print("-- cannot normalize color \(color)")
             return
@@ -159,19 +159,19 @@ struct BitmapCanvas {
         
         let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
         
-        _setPointColor(p, pixelBuffer:pixelBuffer, normalizedColor:normalizedColor)
+        _setColor(p, pixelBuffer:pixelBuffer, normalizedColor:normalizedColor)
     }
     
     subscript(x:Int, y:Int) -> NSColor {
         
         get {
             let p = P(CGFloat(x),CGFloat(y))
-            return pointColor(p)
+            return color(p)
         }
         
         set {
             let p = P(CGFloat(x),CGFloat(y))
-            setPointColor(p, color:newValue)
+            setColor(p, color:newValue)
         }
     }
     
@@ -183,7 +183,7 @@ struct BitmapCanvas {
         
         let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
         
-        let oldColor = _pointColor(p, pixelBuffer:pixelBuffer)
+        let oldColor = _color(p, pixelBuffer:pixelBuffer)
         
         if oldColor == newColor { return }
         
@@ -198,7 +198,7 @@ struct BitmapCanvas {
             
             var x1 = pp.x
             
-            while(x1 >= 0 && _pointColor(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor) {
+            while(x1 >= 0 && _color(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor) {
                 x1--
             }
             
@@ -207,22 +207,22 @@ struct BitmapCanvas {
             var spanAbove = false
             var spanBelow = false
             
-            while(x1 < width && _pointColor(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor ) {
+            while(x1 < width && _color(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor ) {
                 
-                _setPointColor(P(x1, pp.y), pixelBuffer:pixelBuffer, normalizedColor:newColorNormalized)
+                _setColor(P(x1, pp.y), pixelBuffer:pixelBuffer, normalizedColor:newColorNormalized)
                 
                 let north = P(x1, pp.y-1)
                 let south = P(x1, pp.y+1)
                 
-                if spanAbove == false && pp.y > 0 && _pointColor(north, pixelBuffer:pixelBuffer) == oldColor {
+                if spanAbove == false && pp.y > 0 && _color(north, pixelBuffer:pixelBuffer) == oldColor {
                     stack.append(north)
                     spanAbove = true
-                } else if spanAbove && pp.y > 0 && _pointColor(north, pixelBuffer:pixelBuffer) != oldColor {
+                } else if spanAbove && pp.y > 0 && _color(north, pixelBuffer:pixelBuffer) != oldColor {
                     spanAbove = false
-                } else if spanBelow == false && pp.y < height - 1 && _pointColor(south, pixelBuffer:pixelBuffer) == oldColor {
+                } else if spanBelow == false && pp.y < height - 1 && _color(south, pixelBuffer:pixelBuffer) == oldColor {
                     stack.append(south)
                     spanBelow = true
-                } else if spanBelow && pp.y < height - 1 && _pointColor(south, pixelBuffer:pixelBuffer) != oldColor {
+                } else if spanBelow && pp.y < height - 1 && _color(south, pixelBuffer:pixelBuffer) != oldColor {
                     spanBelow = false
                 }
                 
