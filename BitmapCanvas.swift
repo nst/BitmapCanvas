@@ -187,40 +187,55 @@ struct BitmapCanvas {
         }
     }
     
-    func fill(p:NSPoint, color fillColor:NSColor) {
+    func fill(p:NSPoint, color newColor:NSColor) {
+        // floodFillScanlineStack from http://lodev.org/cgtutor/floodfill.html
         
-        let startPointColor = pointColor(p)
+        let oldColor = pointColor(p)
         
-        if startPointColor == fillColor { return }
+        if oldColor == newColor { return }
+
+        var stack : [NSPoint] = [p]
+        //var maxStackCount = 0
         
-        var processed = Array(count:Int(width) * Int(height), repeatedValue:false)
-        
-        var queue : [NSPoint] = [p]
-        
-        var loops = 0
-        
-        while queue.isEmpty == false {
+        while let pp = stack.popLast() {
             
-            let pp = queue.removeFirst()
+            var x1 = pp.x
             
-            if pointColor(pp) != startPointColor { continue }
+            while(x1 >= 0 && pointColor(P(x1, pp.y)) == oldColor) {
+                x1--
+            }
             
-            setPointColor(pp, color: fillColor)
-            processed[Int(width) * Int(pp.y) + Int(pp.x)] = true
+            x1++
             
-            if let ppp = neighbour(pp, direction: .West) where processed[Int(width) * Int(ppp.y) + Int(ppp.x)] == false { queue.append(ppp) }
-            if let ppp = neighbour(pp, direction: .East) where processed[Int(width) * Int(ppp.y) + Int(ppp.x)] == false { queue.append(ppp) }
-            if let ppp = neighbour(pp, direction: .North) where processed[Int(width) * Int(ppp.y) + Int(ppp.x)] == false { queue.append(ppp) }
-            if let ppp = neighbour(pp, direction: .South) where processed[Int(width) * Int(ppp.y) + Int(ppp.x)] == false { queue.append(ppp) }
+            var spanAbove = false
+            var spanBelow = false
             
-            loops += 1
-            
-            //            if loops > 50000 {
-            //                break
-            //            }
-            
+            while(x1 < width && pointColor(P(x1, pp.y)) == oldColor ) {
+                
+                setPointColor(P(x1, pp.y), color:newColor)
+ 
+                let north = P(x1, pp.y-1)
+                let south = P(x1, pp.y+1)
+                
+                if spanAbove == false && pp.y > 0 && pointColor(north) == oldColor {
+                    stack.append(P(CGFloat(x1), pp.y-1))
+                    spanAbove = true
+                } else if spanAbove && pp.y > 0 && pointColor(north) != oldColor {
+                    spanAbove = false
+                } else if spanBelow == false && pp.y < height - 1 && pointColor(south) == oldColor {
+                    stack.append(P(CGFloat(x1), pp.y+1))
+                    spanBelow = true
+                } else if spanBelow && pp.y < height - 1 && pointColor(south) != oldColor {
+                    spanBelow = false
+                }
+                
+                x1++
+                
+                //maxStackCount = max(maxStackCount, stack.count)
+            }
         }
-        
+
+        //print(maxStackCount)
     }
     
     func line(p1:NSPoint, _ p2:NSPoint, color:NSColor? = NSColor.blackColor()) {
