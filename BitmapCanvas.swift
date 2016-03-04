@@ -166,27 +166,6 @@ struct BitmapCanvas {
         }
     }
     
-    enum Direction {
-        case North
-        case West
-        case South
-        case East
-    }
-    
-    func neighbour(p:NSPoint, direction:Direction) -> NSPoint? {
-        if p.x == 0 && direction == .East { return nil }
-        if p.x == self.width-1 && direction == .West { return nil }
-        if p.y == 0 && direction == .North { return nil }
-        if p.y == self.height-1 && direction == .South { return nil }
-        
-        switch direction {
-        case .North: return P(p.x, p.y-1)
-        case .West: return P(p.x+1, p.y)
-        case .South: return P(p.x, p.y+1)
-        case .East: return P(p.x-1, p.y)
-        }
-    }
-    
     func fill(p:NSPoint, color newColor:NSColor) {
         // floodFillScanlineStack from http://lodev.org/cgtutor/floodfill.html
         
@@ -195,7 +174,7 @@ struct BitmapCanvas {
         if oldColor == newColor { return }
 
         var stack : [NSPoint] = [p]
-        //var maxStackCount = 0
+//        var maxStackCount = 0
         
         while let pp = stack.popLast() {
             
@@ -218,12 +197,12 @@ struct BitmapCanvas {
                 let south = P(x1, pp.y+1)
                 
                 if spanAbove == false && pp.y > 0 && pointColor(north) == oldColor {
-                    stack.append(P(CGFloat(x1), pp.y-1))
+                    stack.append(north)
                     spanAbove = true
                 } else if spanAbove && pp.y > 0 && pointColor(north) != oldColor {
                     spanAbove = false
                 } else if spanBelow == false && pp.y < height - 1 && pointColor(south) == oldColor {
-                    stack.append(P(CGFloat(x1), pp.y+1))
+                    stack.append(south)
                     spanBelow = true
                 } else if spanBelow && pp.y < height - 1 && pointColor(south) != oldColor {
                     spanBelow = false
@@ -231,11 +210,12 @@ struct BitmapCanvas {
                 
                 x1++
                 
-                //maxStackCount = max(maxStackCount, stack.count)
+//                maxStackCount = max(maxStackCount, stack.count)
             }
         }
 
-        //print(maxStackCount)
+//        print(maxStackCount)
+
     }
     
     func line(p1:NSPoint, _ p2:NSPoint, color:NSColor? = NSColor.blackColor()) {
