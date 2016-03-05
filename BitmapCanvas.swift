@@ -292,12 +292,18 @@ struct BitmapCanvas {
         return (M_PI * x / 180.0)
     }
     
-    func save(path:String) -> Bool {
+    func save(path:String, open:Bool=false) -> Bool {
         guard let data = bitmapImageRep.representationUsingType(.NSPNGFileType, properties: [:]) else {
             print("\(__FILE__) \(__FUNCTION__) cannot get PNG data from bitmap")
             return false
         }
-        return data.writeToFile(path, atomically: false)
+        let success = data.writeToFile(path, atomically: false)
+        
+        if open {
+            NSWorkspace.sharedWorkspace().openFile(path)
+        }
+        
+        return success
     }
     
     private func textWidth(text:NSString, font:NSFont) -> CGFloat {
