@@ -118,7 +118,24 @@ struct BitmapCanvas {
         CGContextTranslateCTM(cgContext, 0, CGFloat(height))
         CGContextScaleCTM(cgContext, 1.0, -1.0)
     }
-    
+
+    private func _colorIsEqual(p:NSPoint, _ pixelBuffer:UnsafePointer<UInt8>, _ rgba:(UInt8,UInt8,UInt8,UInt8)) -> Bool {
+        
+        let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
+        
+        let r = pixelBuffer[offset]
+        let g = pixelBuffer[offset+1]
+        let b = pixelBuffer[offset+2]
+        let a = pixelBuffer[offset+3]
+        
+        if r != rgba.0 { return false }
+        if g != rgba.1 { return false }
+        if b != rgba.2 { return false }
+        if a != rgba.3 { return false }
+        
+        return true
+    }
+
     private func _color(p:NSPoint, pixelBuffer:UnsafePointer<UInt8>) -> NSColor {
         
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
@@ -183,15 +200,25 @@ struct BitmapCanvas {
         
         let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
         
-        let oldColor = _color(p, pixelBuffer:pixelBuffer)
-        
         guard let newColor = rawNewColor.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
             print("-- cannot normalize color \(rawNewColor)")
             return
         }
 
+        let oldColor = _color(p, pixelBuffer:pixelBuffer)
+        
         if oldColor == newColor { return }
-
+        
+        // store rgba as [UInt8] to speed up comparisons
+        var r : CGFloat = 0.0
+        var g : CGFloat = 0.0
+        var b : CGFloat = 0.0
+        var a : CGFloat = 0.0
+        
+        oldColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        
+        let rgba = (UInt8(r*255),UInt8(g*255),UInt8(b*255),UInt8(a*255))
+        
         var stack : [NSPoint] = [p]
         
         while let pp = stack.popLast() {
@@ -207,22 +234,22 @@ struct BitmapCanvas {
             var spanAbove = false
             var spanBelow = false
             
-            while(x1 < width && _color(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor ) {
+            while(x1 < width && _colorIsEqual(P(x1, pp.y), pixelBuffer, rgba )) {
                 
                 _setColor(P(x1, pp.y), pixelBuffer:pixelBuffer, normalizedColor:newColor)
                 
                 let north = P(x1, pp.y-1)
                 let south = P(x1, pp.y+1)
                 
-                if spanAbove == false && pp.y > 0 && _color(north, pixelBuffer:pixelBuffer) == oldColor {
+                if spanAbove == false && pp.y > 0 && _colorIsEqual(north, pixelBuffer, rgba) {
                     stack.append(north)
                     spanAbove = true
-                } else if spanAbove && pp.y > 0 && _color(north, pixelBuffer:pixelBuffer) != oldColor {
+                } else if spanAbove && pp.y > 0 && !_colorIsEqual(north, pixelBuffer, rgba) {
                     spanAbove = false
-                } else if spanBelow == false && pp.y < height - 1 && _color(south, pixelBuffer:pixelBuffer) == oldColor {
+                } else if spanBelow == false && pp.y < height - 1 && _colorIsEqual(south, pixelBuffer, rgba) {
                     stack.append(south)
                     spanBelow = true
-                } else if spanBelow && pp.y < height - 1 && _color(south, pixelBuffer:pixelBuffer) != oldColor {
+                } else if spanBelow && pp.y < height - 1 && !_colorIsEqual(south, pixelBuffer, rgba) {
                     spanBelow = false
                 }
                 
