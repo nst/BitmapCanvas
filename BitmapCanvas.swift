@@ -175,7 +175,7 @@ struct BitmapCanvas {
         }
     }
     
-    func fill(p:NSPoint, color newColor:NSColor) {
+    func fill(p:NSPoint, color rawNewColor:NSColor) {
         // floodFillScanlineStack from http://lodev.org/cgtutor/floodfill.html
         
         assert(p.x < width, "p.x \(p.x) out of range, must be < \(width)")
@@ -185,13 +185,13 @@ struct BitmapCanvas {
         
         let oldColor = _color(p, pixelBuffer:pixelBuffer)
         
-        if oldColor == newColor { return }
-        
-        guard let newColorNormalized = newColor.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
-            print("-- cannot normalize color \(newColor)")
+        guard let newColor = rawNewColor.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
+            print("-- cannot normalize color \(rawNewColor)")
             return
         }
-        
+
+        if oldColor == newColor { return }
+
         var stack : [NSPoint] = [p]
         
         while let pp = stack.popLast() {
@@ -209,20 +209,23 @@ struct BitmapCanvas {
             
             while(x1 < width && _color(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor ) {
                 
-                _setColor(P(x1, pp.y), pixelBuffer:pixelBuffer, normalizedColor:newColorNormalized)
+                _setColor(P(x1, pp.y), pixelBuffer:pixelBuffer, normalizedColor:newColor)
                 
                 let north = P(x1, pp.y-1)
                 let south = P(x1, pp.y+1)
                 
-                if spanAbove == false && pp.y > 0 && _color(north, pixelBuffer:pixelBuffer) == oldColor {
+                let northColor = _color(north, pixelBuffer:pixelBuffer)
+                let southColor = _color(south, pixelBuffer:pixelBuffer)
+                
+                if spanAbove == false && pp.y > 0 && northColor == oldColor {
                     stack.append(north)
                     spanAbove = true
-                } else if spanAbove && pp.y > 0 && _color(north, pixelBuffer:pixelBuffer) != oldColor {
+                } else if spanAbove && pp.y > 0 && northColor != oldColor {
                     spanAbove = false
-                } else if spanBelow == false && pp.y < height - 1 && _color(south, pixelBuffer:pixelBuffer) == oldColor {
+                } else if spanBelow == false && pp.y < height - 1 && southColor == oldColor {
                     stack.append(south)
                     spanBelow = true
-                } else if spanBelow && pp.y < height - 1 && _color(south, pixelBuffer:pixelBuffer) != oldColor {
+                } else if spanBelow && pp.y < height - 1 && southColor != oldColor {
                     spanBelow = false
                 }
                 
@@ -327,6 +330,11 @@ struct BitmapCanvas {
             print("\(__FILE__) \(__FUNCTION__) cannot create bitmap image rep from data at \(path)");
             return
         }
+
+        guard let cgImage = imgRep.CGImage else {
+            print("\(__FILE__) \(__FUNCTION__) cannot get cgImage out of imageRep from \(path)");
+            return
+        }
         
         context.saveGraphicsState()
         
@@ -334,8 +342,8 @@ struct BitmapCanvas {
         CGContextTranslateCTM(cgContext, 0.0, -2.0 * p.y - imgRep.pixelsHigh)
         
         let rect = NSMakeRect(p.x, p.y, CGFloat(imgRep.pixelsWide), CGFloat(imgRep.pixelsHigh))
-        
-        imgRep.drawInRect(rect)
+                
+        CGContextDrawImage(cgContext, rect, cgImage)
         
         context.restoreGraphicsState()
     }
