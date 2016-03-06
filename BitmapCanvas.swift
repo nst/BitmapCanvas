@@ -89,7 +89,7 @@ struct BitmapCanvas {
         CGContextSetAllowsAntialiasing(cgContext, antialiasing)
     }
     
-    init(_ width:Int, _ height:Int, backgroundColor:NSColor? = nil) {
+    init(_ width:Int, _ height:Int, _ background:ConvertibleToNSColor? = nil) {
         
         self.bitmapImageRep = NSBitmapImageRep(
             bitmapDataPlanes:nil,
@@ -109,16 +109,16 @@ struct BitmapCanvas {
         
         setAllowsAntialiasing(false)
         
-        if let color = backgroundColor {
+        if let b = background {
             let rect = NSMakeRect(0, 0, CGFloat(width), CGFloat(height))
-            rectangle(rect, strokeColor: color, fillColor: color)
+            rectangle(rect, strokeColor: b.color, fillColor: b.color)
         }
         
         // makes coordinates start upper left
         CGContextTranslateCTM(cgContext, 0, CGFloat(height))
         CGContextScaleCTM(cgContext, 1.0, -1.0)
     }
-
+    
     private func _colorIsEqual(p:NSPoint, _ pixelBuffer:UnsafePointer<UInt8>, _ rgba:(UInt8,UInt8,UInt8,UInt8)) -> Bool {
         
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
@@ -135,7 +135,7 @@ struct BitmapCanvas {
         
         return true
     }
-
+    
     private func _color(p:NSPoint, pixelBuffer:UnsafePointer<UInt8>) -> NSColor {
         
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
@@ -168,7 +168,10 @@ struct BitmapCanvas {
         pixelBuffer[offset+3] = UInt8(normalizedColor.alphaComponent * 255.0)
     }
     
-    func setColor(p:NSPoint, color:NSColor) {
+    func setColor(p:NSPoint, color color_:ConvertibleToNSColor) {
+        
+        let color = color_.color
+        
         guard let normalizedColor = color.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
             print("-- cannot normalize color \(color)")
             return
@@ -192,8 +195,10 @@ struct BitmapCanvas {
         }
     }
     
-    func fill(p:NSPoint, color rawNewColor:NSColor) {
+    func fill(p:NSPoint, color rawNewColor_:ConvertibleToNSColor) {
         // floodFillScanlineStack from http://lodev.org/cgtutor/floodfill.html
+        
+        let rawNewColor = rawNewColor_.color
         
         assert(p.x < width, "p.x \(p.x) out of range, must be < \(width)")
         assert(p.y < height, "p.y \(p.y) out of range, must be < \(height)")
@@ -204,7 +209,7 @@ struct BitmapCanvas {
             print("-- cannot normalize color \(rawNewColor)")
             return
         }
-
+        
         let oldColor = _color(p, pixelBuffer:pixelBuffer)
         
         if oldColor == newColor { return }
@@ -258,7 +263,10 @@ struct BitmapCanvas {
         }
     }
     
-    func line(p1:NSPoint, _ p2:NSPoint, color:NSColor? = NSColor.blackColor()) {
+    func line(p1:NSPoint, _ p2:NSPoint, color color_:ConvertibleToNSColor? = NSColor.blackColor()) {
+        
+        let color = color_?.color
+        
         context.saveGraphicsState()
         
         // align to the pixel grid
@@ -276,26 +284,32 @@ struct BitmapCanvas {
         context.restoreGraphicsState()
     }
     
-    func lineVertical(p1:NSPoint, height:CGFloat, color:NSColor? = nil) {
+    func lineVertical(p1:NSPoint, height:CGFloat, color color_:ConvertibleToNSColor? = nil) {
+        let color = color_?.color
         let p2 = P(p1.x, p1.y + height - 1)
         self.line(p1, p2, color:color)
     }
     
-    func lineHorizontal(p1:NSPoint, width:CGFloat, color:NSColor? = nil) {
+    func lineHorizontal(p1:NSPoint, width:CGFloat, color color_:ConvertibleToNSColor? = nil) {
+        let color = color_?.color
         let p2 = P(p1.x + width - 1, p1.y)
         self.line(p1, p2, color:color)
     }
     
-    func line(p1:NSPoint, deltaX:CGFloat, deltaY:CGFloat, color:NSColor? = nil) {
+    func line(p1:NSPoint, deltaX:CGFloat, deltaY:CGFloat, color color_:ConvertibleToNSColor? = nil) {
+        let color = color_?.color
         let p2 = P(p1.x + deltaX, p1.y + deltaY)
-        self.line(p1, p2)
+        self.line(p1, p2, color:color)
     }
     
     func rectangle(rect:NSRect) {
         rectangle(rect, fillColor: nil)
     }
     
-    func rectangle(rect:NSRect, strokeColor:NSColor? = NSColor.blackColor(), fillColor:NSColor? = nil) {
+    func rectangle(rect:NSRect, strokeColor strokeColor_:ConvertibleToNSColor? = NSColor.blackColor(), fillColor fillColor_:ConvertibleToNSColor? = nil) {
+        
+        let strokeColor = strokeColor_?.color
+        let fillColor = fillColor_?.color
         
         context.saveGraphicsState()
         
@@ -354,7 +368,7 @@ struct BitmapCanvas {
             print("\(__FILE__) \(__FUNCTION__) cannot create bitmap image rep from data at \(path)");
             return
         }
-
+        
         guard let cgImage = imgRep.CGImage else {
             print("\(__FILE__) \(__FUNCTION__) cannot get cgImage out of imageRep from \(path)");
             return
@@ -366,13 +380,15 @@ struct BitmapCanvas {
         CGContextTranslateCTM(cgContext, 0.0, -2.0 * p.y - imgRep.pixelsHigh)
         
         let rect = NSMakeRect(p.x, p.y, CGFloat(imgRep.pixelsWide), CGFloat(imgRep.pixelsHigh))
-                
+        
         CGContextDrawImage(cgContext, rect, cgImage)
         
         context.restoreGraphicsState()
     }
     
-    func text(text:String, _ p:NSPoint, rotationRadians:CGFloat?, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : NSColor = NSColor.blackColor(), allowsAntialiasing : Bool = false) {
+    func text(text:String, _ p:NSPoint, rotationRadians:CGFloat?, font : NSFont = NSFont(name: "Monaco", size: 10)!, color color_ : ConvertibleToNSColor = NSColor.blackColor(), allowsAntialiasing : Bool = false) {
+        
+        let color = color_.color
         
         let attr = [
             NSFontAttributeName:font,
@@ -397,7 +413,7 @@ struct BitmapCanvas {
         context.restoreGraphicsState()
     }
     
-    func text(text:String, _ p:NSPoint, rotationDegrees degrees:CGFloat = 0.0, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : NSColor = NSColor.blackColor(), allowsAntialiasing : Bool = false) {
+    func text(text:String, _ p:NSPoint, rotationDegrees degrees:CGFloat = 0.0, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : ConvertibleToNSColor = NSColor.blackColor(), allowsAntialiasing : Bool = false) {
         self.text(text, p, rotationRadians: degreesToRadians(degrees), font: font, color: color)
     }
 }

@@ -19,7 +19,7 @@ func switzerland() {
     guard let optSwitzerland = try? NSJSONSerialization.JSONObjectWithData(switzerlandData, options: []) as? [String:AnyObject] else { return }
     guard let switzerland = optSwitzerland else { return }
     
-    let b = BitmapCanvas(365, 235, backgroundColor: NSColor.whiteColor())
+    let b = BitmapCanvas(365, 235, "white")
 
     b.image(fromPath: "/Users/nst/Projects/BitmapCanvas/files/switzerland.gif", P(0,0))
     
@@ -85,24 +85,21 @@ func switzerland() {
 }
 
 func bitmap() {
-    // let b = BitmapCanvas(32, 32)
-    
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-    let b = BitmapCanvas(32, 32, backgroundColor: color)
+
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
     
     b.save("/tmp/bitmap.png")
 }
 
 func points() {
     
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0).colorUsingColorSpaceName(NSDeviceRGBColorSpace)
-    var b = BitmapCanvas(32, 32, backgroundColor: color)
+    var b = BitmapCanvas(32, 32, "PapayaWhip")
     
-    b[1,1] = NSColor.blackColor()
+b[1,1] = NSColor.blackColor()
 
-    b[1,3] = NSColor.redColor()
-    b[2,3] = NSColor.greenColor()
-    b[3,3] = NSColor.blueColor()
+b[1,3] = NSColor.redColor()
+b[2,3] = NSColor.greenColor()
+b[3,3] = NSColor.blueColor()
     
     print(NSColor.blueColor())
     print(b[3,3])
@@ -112,93 +109,87 @@ func points() {
 
 func lines() {
     
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-    let b = BitmapCanvas(32, 32, backgroundColor: color)
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
     
-    b.line(P(1,1), P(10,10))
-    
-    b.line(P(1,10), P(10,19), color: NSColor.redColor())
-    b.lineHorizontal(P(1,21), width: 20)
-    b.lineVertical(P(20, 1), height: 19, color: NSColor.blueColor())
+b.line(P(1,1), P(10,10))
+
+b.line(P(1,10), P(10,19), color:"red")
+b.lineHorizontal(P(1,21), width:20)
+b.lineVertical(P(20, 1), height:19, color:"blue")
     
     b.save("/tmp/bitmap_lines.png")
 }
 
 func rects() {
     
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-    let b = BitmapCanvas(32, 32, backgroundColor: color)
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
     
-    b.rectangle(R(5,5,20,10))
-    
-    b.rectangle(R(10,10,20,10), strokeColor: NSColor.blueColor(), fillColor: NSColor.magentaColor())
+b.rectangle(R(5,5,20,10))
+
+b.rectangle(R(10,10,20,10), strokeColor:"blue", fillColor:"magenta")
     
     b.save("/tmp/bitmap_rects.png")
 }
 
 func text() {
     
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-    let b = BitmapCanvas(32, 32, backgroundColor: color)
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
     
-    b.text("hi", P(5,10))
-    
-    b.text("hello", P(20,30),
-        rotationDegrees: -90,
-        font: NSFont(name: "Helvetica", size: 10)!,
-        color: NSColor.redColor())
+b.text("hi", P(5,10))
+
+b.text("hello", P(20,30),
+    rotationDegrees: -90,
+    font: NSFont(name: "Helvetica", size: 10)!,
+    color: NSColor.redColor())
     
     b.save("/tmp/bitmap_text.png")
 }
 
 func image() {
     
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-    let b = BitmapCanvas(32, 32, backgroundColor: color)
-    
-    b.image(fromPath:"/usr/share/httpd/icons/sphere2.png", P(0,0))
-    
-    b.save("/tmp/bitmap_image.png", open:true)
+let b = BitmapCanvas(32, 32, "PapayaWhip")
+
+b.image(fromPath:"/usr/share/httpd/icons/sphere2.png", P(0,0))
+
+b.save("/tmp/bitmap_image.png", open:true)
 }
 
 func bezier() {
     
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-    let b = BitmapCanvas(32, 32, backgroundColor: color)
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
     
-    b.setAllowsAntialiasing(true)
-    
-    NSColor.orangeColor().setFill()
-    
-    let bp = NSBezierPath()
-    bp.moveToPoint(P(2,2))
-    bp.curveToPoint(P(20,14), controlPoint1: P(14,30), controlPoint2: P(15,30))
-    bp.curveToPoint(P(32,13), controlPoint1: P(24,14), controlPoint2: P(24,19))
-    bp.closePath()
-    bp.fill()
-    bp.stroke()
+b.setAllowsAntialiasing(true)
+
+NSColor.orangeColor().setFill()
+
+let bp = NSBezierPath()
+bp.moveToPoint(P(2,2))
+bp.curveToPoint(P(20,14), controlPoint1: P(14,30), controlPoint2: P(15,30))
+bp.curveToPoint(P(32,13), controlPoint1: P(24,14), controlPoint2: P(24,19))
+bp.closePath()
+bp.fill()
+bp.stroke()
     
     b.save("/tmp/bitmap_bezier.png")
 }
 
 func cgContext() {
     
-    let color = NSColor(deviceWhite: 0.95, alpha: 1.0)
-    let b = BitmapCanvas(32, 32, backgroundColor: color)
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
     
-    CGContextAddEllipseInRect(b.cgContext, R(2, 2, 24, 24))
-    CGContextStrokePath(b.cgContext)
-    
-    b.setAllowsAntialiasing(true)
-    
-    CGContextSetStrokeColorWithColor(b.cgContext, NSColor.blueColor().CGColor)
-    CGContextAddEllipseInRect(b.cgContext, R(12, 12, 24, 24))
-    CGContextStrokePath(b.cgContext)
+CGContextAddEllipseInRect(b.cgContext, R(2, 2, 24, 24))
+CGContextStrokePath(b.cgContext)
+
+b.setAllowsAntialiasing(true)
+
+CGContextSetStrokeColorWithColor(b.cgContext, NSColor.blueColor().CGColor)
+CGContextAddEllipseInRect(b.cgContext, R(12, 12, 24, 24))
+CGContextStrokePath(b.cgContext)
     
     b.save("/tmp/bitmap_cgcontext.png")
 }
 
-//switzerland()
+switzerland()
 
 bitmap()
 points()
@@ -208,3 +199,7 @@ text()
 image()
 bezier()
 cgContext()
+
+//let b = BitmapCanvas(6000,6000, "SkyBlue")
+//b.fill(P(270,243), color: NSColor.blueColor())
+//b.save("/tmp/out.png", open: true)
