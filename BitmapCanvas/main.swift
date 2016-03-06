@@ -189,7 +189,7 @@ CGContextStrokePath(b.cgContext)
     b.save("/tmp/bitmap_cgcontext.png")
 }
 
-switzerland()
+//switzerland()
 
 bitmap()
 points()
