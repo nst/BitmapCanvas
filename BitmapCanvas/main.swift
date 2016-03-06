@@ -23,12 +23,6 @@ func switzerland() {
 
     b.image(fromPath: "/Users/nst/Projects/BitmapCanvas/files/switzerland.gif", P(0,0))
     
-    b.fill(P(0,0), color: NSColor.whiteColor())
-    b.fill(P(0,170), color: NSColor.whiteColor())
-    b.fill(P(300,0), color: NSColor.whiteColor())
-    b.fill(P(355,110), color: NSColor.whiteColor())
-    b.fill(P(300,190), color: NSColor.whiteColor())
-
     let font = NSFont(name: "Monaco", size: 10)!
     b.text("2016-02-28 \"Pas de spéculation sur les denrées alimentaires\"", P(5,220), font:font)
     
@@ -87,7 +81,7 @@ func switzerland() {
     
     let path = "/tmp/out.png"
     
-    b.save(path)
+    b.save(path, open:true)
 }
 
 func bitmap() {
@@ -113,7 +107,7 @@ func points() {
     print(NSColor.blueColor())
     print(b[3,3])
     
-    b.save("/tmp/bitmap_points.png", open:true)
+    b.save("/tmp/bitmap_points.png")
 }
 
 func lines() {
@@ -164,7 +158,7 @@ func image() {
     
     b.image(fromPath:"/usr/share/httpd/icons/sphere2.png", P(0,0))
     
-    b.save("/tmp/bitmap_image.png")
+    b.save("/tmp/bitmap_image.png", open:true)
 }
 
 func bezier() {
