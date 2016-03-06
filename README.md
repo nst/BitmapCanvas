@@ -49,7 +49,7 @@ b.lineVertical(P(20, 1), height:19, color:"blue")</PRE>
     <TD><IMG SRC="img/rects.png" /></TD>
     <TD><PRE>b.rectangle(R(5,5,20,10))
 
-b.rectangle(R(10,10,20,10), strokeColor:"blue", fillColor:"magenta")</PRE>
+b.rectangle(R(10,10,20,10), stroke:"blue", fill:"magenta")</PRE>
     </TD>
 </TR>
 

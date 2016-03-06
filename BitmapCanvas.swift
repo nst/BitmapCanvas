@@ -111,7 +111,7 @@ struct BitmapCanvas {
         
         if let b = background {
             let rect = NSMakeRect(0, 0, CGFloat(width), CGFloat(height))
-            rectangle(rect, strokeColor: b.color, fillColor: b.color)
+            rectangle(rect, stroke: b.color, fill: b.color)
         }
         
         // makes coordinates start upper left
@@ -303,25 +303,25 @@ struct BitmapCanvas {
     }
     
     func rectangle(rect:NSRect) {
-        rectangle(rect, fillColor: nil)
+        rectangle(rect, fill: nil)
     }
     
-    func rectangle(rect:NSRect, strokeColor strokeColor_:ConvertibleToNSColor? = NSColor.blackColor(), fillColor fillColor_:ConvertibleToNSColor? = nil) {
+    func rectangle(rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {
         
-        let strokeColor = strokeColor_?.color
-        let fillColor = fillColor_?.color
+        let stroke = stroke_?.color
+        let fill = fill_?.color
         
         context.saveGraphicsState()
         
         // align to the pixel grid
         CGContextTranslateCTM(cgContext, 0.5, 0.5)
         
-        if let existingFillColor = fillColor {
+        if let existingFillColor = fill {
             existingFillColor.setFill()
             NSBezierPath.fillRect(rect)
         }
         
-        if let existingStrokeColor = strokeColor {
+        if let existingStrokeColor = stroke {
             existingStrokeColor.setStroke()
             NSBezierPath.strokeRect(rect)
         }
