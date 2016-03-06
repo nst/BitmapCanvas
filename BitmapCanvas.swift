@@ -214,18 +214,15 @@ struct BitmapCanvas {
                 let north = P(x1, pp.y-1)
                 let south = P(x1, pp.y+1)
                 
-                let northColor = _color(north, pixelBuffer:pixelBuffer)
-                let southColor = _color(south, pixelBuffer:pixelBuffer)
-                
-                if spanAbove == false && pp.y > 0 && northColor == oldColor {
+                if spanAbove == false && pp.y > 0 && _color(north, pixelBuffer:pixelBuffer) == oldColor {
                     stack.append(north)
                     spanAbove = true
-                } else if spanAbove && pp.y > 0 && northColor != oldColor {
+                } else if spanAbove && pp.y > 0 && _color(north, pixelBuffer:pixelBuffer) != oldColor {
                     spanAbove = false
-                } else if spanBelow == false && pp.y < height - 1 && southColor == oldColor {
+                } else if spanBelow == false && pp.y < height - 1 && _color(south, pixelBuffer:pixelBuffer) == oldColor {
                     stack.append(south)
                     spanBelow = true
-                } else if spanBelow && pp.y < height - 1 && southColor != oldColor {
+                } else if spanBelow && pp.y < height - 1 && _color(south, pixelBuffer:pixelBuffer) != oldColor {
                     spanBelow = false
                 }
                 
