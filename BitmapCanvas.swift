@@ -110,8 +110,15 @@ struct BitmapCanvas {
         setAllowsAntialiasing(false)
         
         if let b = background {
+
             let rect = NSMakeRect(0, 0, CGFloat(width), CGFloat(height))
-            rectangle(rect, stroke: b.color, fill: b.color)
+            
+            context.saveGraphicsState()
+            
+            b.color.setFill()
+            NSBezierPath.fillRect(rect)
+            
+            context.restoreGraphicsState()
         }
         
         // makes coordinates start upper left
