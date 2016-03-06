@@ -101,11 +101,7 @@ bp.stroke()</PRE>
 
 <TR>
     <TD><IMG SRC="img/file.png" /></TD>
-    <TD><PRE>let path = "/tmp/bitmap.png"
-b.save(path)
-
-NSWorkspace.sharedWorkspace().openFile(path)
-</PRE>
+    <TD><PRE>b.save("/tmp/image.png", open:true)</PRE>
     </TD>
 </TR>
 
