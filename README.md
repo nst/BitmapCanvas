@@ -5,13 +5,13 @@ __Description__
 
 A clear, simple and concise API over a CoreGraphics bitmap context.  
 Loosely inspired by the ImageDraw Python library.  
-Especially useful for [data visualizations](https://github.com/nst/DevTeamActivity).
+Especially useful for [data](files/switzerland.png) [visualizations](https://github.com/nst/DevTeamActivity).
 
 __Features__
 
 * upper-left corner based coordinates
 * pixel perfect drawing of points, lines, rectangles and texts
-* colors as NSColor, hex strings ``"#AA00DF"`` or X11 names ``"SkyBlue"``)
+* colors as NSColor, hex strings ``"#AA00DF"`` or X11 names ``"SkyBlue"``
 * save as PNG
 * usable with regular CoreGraphics code
 
