@@ -203,3 +203,5 @@ cgContext()
 //let b = BitmapCanvas(6000,6000, "SkyBlue")
 //b.fill(P(270,243), color: NSColor.blueColor())
 //b.save("/tmp/out.png", open: true)
+
+X11Colors.dump("/opt/X11/share/X11/rgb.txt", outPath:"/tmp/X11.clr")

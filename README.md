@@ -110,3 +110,11 @@ NSWorkspace.sharedWorkspace().openFile(path)
 </TR>
 
 </TABLE>
+
+You can also dump the X11 color list with:
+
+    X11Colors.dump("/opt/X11/share/X11/rgb.txt", outPath:"/tmp/X11.clr")
+
+or download the file directly [X11.clr.zip]()
+
+![X11 Color List](files/x11.clr.png)
