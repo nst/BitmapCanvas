@@ -104,7 +104,7 @@ func points() {
     print(NSColor.blueColor())
     print(b[3,3])
     
-    b.save("/tmp/bitmap_points.png")
+    b.save("/tmp/points.png")
 }
 
 func lines() {
@@ -117,7 +117,7 @@ func lines() {
     b.lineHorizontal(P(1,21), width:20)
     b.lineVertical(P(20, 1), height:19, color:"blue")
     
-    b.save("/tmp/bitmap_lines.png")
+    b.save("/tmp/lines.png")
 }
 
 func rects() {
@@ -128,7 +128,7 @@ func rects() {
     
     b.rectangle(R(10,10,20,10), stroke:"blue", fill:"magenta")
     
-    b.save("/tmp/bitmap_rects.png")
+    b.save("/tmp/rects.png")
 }
 
 func text() {
@@ -142,7 +142,7 @@ func text() {
         font: NSFont(name: "Helvetica", size: 10)!,
         color: NSColor.redColor())
     
-    b.save("/tmp/bitmap_text.png")
+    b.save("/tmp/text.png")
 }
 
 func image() {
@@ -151,7 +151,7 @@ func image() {
     
     b.image(fromPath:"/usr/share/httpd/icons/sphere2.png", P(0,0))
     
-    b.save("/tmp/bitmap_image.png", open:true)
+    b.save("/tmp/image.png", open:true)
 }
 
 func bezier() {
@@ -170,7 +170,7 @@ func bezier() {
     bp.fill()
     bp.stroke()
     
-    b.save("/tmp/bitmap_bezier.png")
+    b.save("/tmp/bezier.png")
 }
 
 func cgContext() {
@@ -186,7 +186,7 @@ func cgContext() {
     CGContextAddEllipseInRect(b.cgContext, R(12, 12, 24, 24))
     CGContextStrokePath(b.cgContext)
     
-    b.save("/tmp/bitmap_cgcontext.png")
+    b.save("/tmp/cgcontext.png")
 }
 
 //switzerland()
