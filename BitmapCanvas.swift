@@ -189,7 +189,7 @@ struct BitmapCanvas {
         _setColor(p, pixelBuffer:pixelBuffer, normalizedColor:normalizedColor)
     }
     
-    subscript(x:Int, y:Int) -> NSColor {
+    subscript(x:Int, y:Int) -> ConvertibleToNSColor {
         
         get {
             let p = P(CGFloat(x),CGFloat(y))

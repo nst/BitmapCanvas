@@ -29,8 +29,8 @@ __Examples__
     <TD><IMG SRC="img/points.png" /></TD>
 <TD><PRE>b[1,1] = NSColor.blackColor()
 
-b[1,3] = NSColor.redColor()
-b[2,3] = NSColor.greenColor()
+b[1,3] = "red"
+b[2,3] = "#00FF00"
 b[3,3] = NSColor.blueColor()</PRE>
     </TD>
 </TR>
