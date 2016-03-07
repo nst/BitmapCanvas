@@ -54,6 +54,14 @@ b.rectangle(R(10,10,20,10), stroke:"blue", fill:"magenta")</PRE>
 </TR>
 
 <TR>
+    <TD><IMG SRC="img/ellipse.png" /></TD>
+    <TD><PRE>b.ellipse(R(5,5,20,10))
+
+b.ellipse(R(10,10,18,21), stroke:"blue", fill:"magenta")</PRE>
+    </TD>
+</TR>
+
+<TR>
     <TD><IMG SRC="img/text.png" /></TD>
     <TD><PRE>b.text("hi", P(5,10))
 
@@ -67,19 +75,6 @@ b.text("hello", P(20,30),
 <TR>
     <TD><IMG SRC="img/image.png" /></TD>
     <TD><PRE>b.image(fromPath:"/usr/share/httpd/icons/sphere2.png", P(0,0))</PRE>
-    </TD>
-</TR>
-
-<TR>
-    <TD><IMG SRC="img/cgcontext.png" /></TD>
-    <TD><PRE>CGContextAddEllipseInRect(b.cgContext, R(2, 2, 24, 24))
-CGContextStrokePath(b.cgContext)
-
-b.setAllowsAntialiasing(true)
-
-CGContextSetStrokeColorWithColor(b.cgContext, NSColor.blueColor().CGColor)
-CGContextAddEllipseInRect(b.cgContext, R(12, 12, 24, 24))
-CGContextStrokePath(b.cgContext)</PRE>
     </TD>
 </TR>
 

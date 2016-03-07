@@ -110,7 +110,7 @@ struct BitmapCanvas {
         setAllowsAntialiasing(false)
         
         if let b = background {
-
+            
             let rect = NSMakeRect(0, 0, CGFloat(width), CGFloat(height))
             
             context.saveGraphicsState()
@@ -309,10 +309,6 @@ struct BitmapCanvas {
         self.line(p1, p2, color:color)
     }
     
-    func rectangle(rect:NSRect) {
-        rectangle(rect, fill: nil)
-    }
-    
     func rectangle(rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {
         
         let stroke = stroke_?.color
@@ -332,6 +328,32 @@ struct BitmapCanvas {
             existingStrokeColor.setStroke()
             NSBezierPath.strokeRect(rect)
         }
+        
+        context.restoreGraphicsState()
+    }
+    
+    func ellipse(rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {
+        
+        let strokeColor = stroke_?.color
+        let fillColor = fill_?.color
+        
+        context.saveGraphicsState()
+        
+        // align to the pixel grid
+        CGContextTranslateCTM(cgContext, 0.5, 0.5)
+        
+        // fill
+        if let existingFillColor = fillColor {
+            existingFillColor.setFill()
+            
+            // reduce fillRect so that is doesn't cross the stoke
+            let fillRect = R(rect.origin.x+1, rect.origin.y+1, rect.size.width-2, rect.size.height-2)
+            CGContextFillEllipseInRect(cgContext, fillRect)
+        }
+        
+        // stroke
+        if let existingStrokeColor = strokeColor { existingStrokeColor.setStroke() }
+        CGContextStrokeEllipseInRect(cgContext, rect)
         
         context.restoreGraphicsState()
     }
