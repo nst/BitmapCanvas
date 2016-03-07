@@ -270,7 +270,7 @@ struct BitmapCanvas {
         }
     }
     
-    func line(p1:NSPoint, _ p2:NSPoint, color color_:ConvertibleToNSColor? = NSColor.blackColor()) {
+    func line(p1:NSPoint, _ p2:NSPoint, _ color_:ConvertibleToNSColor? = NSColor.blackColor()) {
         
         let color = color_?.color
         
@@ -291,22 +291,22 @@ struct BitmapCanvas {
         context.restoreGraphicsState()
     }
     
-    func lineVertical(p1:NSPoint, height:CGFloat, color color_:ConvertibleToNSColor? = nil) {
+    func lineVertical(p1:NSPoint, height:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
         let color = color_?.color
         let p2 = P(p1.x, p1.y + height - 1)
-        self.line(p1, p2, color:color)
+        self.line(p1, p2, color)
     }
     
-    func lineHorizontal(p1:NSPoint, width:CGFloat, color color_:ConvertibleToNSColor? = nil) {
+    func lineHorizontal(p1:NSPoint, width:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
         let color = color_?.color
         let p2 = P(p1.x + width - 1, p1.y)
-        self.line(p1, p2, color:color)
+        self.line(p1, p2, color)
     }
     
-    func line(p1:NSPoint, deltaX:CGFloat, deltaY:CGFloat, color color_:ConvertibleToNSColor? = nil) {
+    func line(p1:NSPoint, deltaX:CGFloat, deltaY:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
         let color = color_?.color
         let p2 = P(p1.x + deltaX, p1.y + deltaY)
-        self.line(p1, p2, color:color)
+        self.line(p1, p2, color)
     }
     
     func rectangle(rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {

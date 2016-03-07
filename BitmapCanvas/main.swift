@@ -110,9 +110,9 @@ func lines() {
     
     b.line(P(1,1), P(10,10))
     
-    b.line(P(1,10), P(10,19), color:"red")
+    b.line(P(1,10), P(10,19), "red")
     b.lineHorizontal(P(1,21), width:20)
-    b.lineVertical(P(20, 1), height:19, color:"blue")
+    b.lineVertical(P(20, 1), height:19, "blue")
     
     b.save("/tmp/lines.png")
 }
