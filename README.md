@@ -95,6 +95,19 @@ bp.stroke()</PRE>
 </TR>
 
 <TR>
+<TD><IMG SRC="img/cgcontext.png" /></TD>
+<TD><PRE>CGContextAddEllipseInRect(b.cgContext, R(2, 2, 24, 24))
+CGContextStrokePath(b.cgContext)
+
+b.setAllowsAntialiasing(true)
+
+CGContextSetStrokeColorWithColor(b.cgContext, NSColor.blueColor().CGColor)
+CGContextAddEllipseInRect(b.cgContext, R(12, 12, 24, 24))
+CGContextStrokePath(b.cgContext)</PRE>
+</TD>
+</TR>
+
+<TR>
     <TD><IMG SRC="img/file.png" /></TD>
     <TD><PRE>b.save("/tmp/image.png", open:true)</PRE>
     </TD>
