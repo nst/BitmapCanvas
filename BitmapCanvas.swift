@@ -68,6 +68,10 @@ func R(x:CGFloat, _ y:CGFloat, _ w:CGFloat, _ h:CGFloat) -> NSRect {
     return NSMakeRect(x, y, w, h)
 }
 
+func R(x:Int, _ y:Int, _ w:Int, _ h:Int) -> NSRect {
+    return NSMakeRect(CGFloat(x), CGFloat(y), CGFloat(w), CGFloat(h))
+}
+
 struct BitmapCanvas {
     
     let bitmapImageRep : NSBitmapImageRep

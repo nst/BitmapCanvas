@@ -198,16 +198,55 @@ func cgContext() {
 }
 
 func colors() {
-
+    
     var b = BitmapCanvas(255, 255)
     for i in 0...255 {
         for j in 0...255 {
             b[i,j] = NSColor(i,j,100)
         }
     }
-
+    
     b.save("/tmp/colors.png", open:true)
 }
+
+func voronoi(w w:Int, h:Int, n:Int) {
+    
+    var b = BitmapCanvas(w, h)
+    
+    var pointsColors : [(NSPoint, NSColor)] = []
+    
+    for _ in 0...n {
+        let p = P(CGFloat(arc4random_uniform((UInt32(w+1)))), CGFloat(arc4random_uniform((UInt32(h+1)))))
+        let c = C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
+        pointsColors.append((p,c))
+    }
+    
+    for x in 0...w {
+        for y in 0...h {
+            
+            var dmin = CGFloat.max
+            var color = NSColor.clearColor()
+            
+            for (p,c) in pointsColors {
+                let d = hypot(p.x-x, p.y-y)
+                if d < dmin {
+                    dmin = d
+                    color = c
+                }
+            }
+            
+            b[x,y] = color
+        }
+    }
+    
+    for (p,_) in pointsColors {
+        let rect = R(p.x-2, p.y-2, 4, 4)
+        b.ellipse(rect, stroke:"black", fill:"black")
+    }
+    
+    b.save("/tmp/voronoi.png", open:true)
+}
+
 
 //switzerland()
 
@@ -221,10 +260,10 @@ image()
 bezier()
 cgContext()
 colors()
+//voronoi(w:256, h:256, n:25)
 
 //let b = BitmapCanvas(6000,6000, "SkyBlue")
 //b.fill(P(270,243), color: NSColor.blueColor())
 //b.save("/tmp/out.png", open: true)
 
 X11Colors.dump("/opt/X11/share/X11/rgb.txt", outPath:"/tmp/X11.clr")
-
