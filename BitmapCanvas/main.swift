@@ -197,6 +197,18 @@ func cgContext() {
     b.save("/tmp/cgcontext.png")
 }
 
+func colors() {
+
+    var b = BitmapCanvas(255, 255)
+    for i in 0...255 {
+        for j in 0...255 {
+            b[i,j] = NSColor(i,j,100)
+        }
+    }
+
+    b.save("/tmp/colors.png", open:true)
+}
+
 //switzerland()
 
 bitmap()
@@ -208,9 +220,11 @@ text()
 image()
 bezier()
 cgContext()
+colors()
 
 //let b = BitmapCanvas(6000,6000, "SkyBlue")
 //b.fill(P(270,243), color: NSColor.blueColor())
 //b.save("/tmp/out.png", open: true)
 
 X11Colors.dump("/opt/X11/share/X11/rgb.txt", outPath:"/tmp/X11.clr")
+
