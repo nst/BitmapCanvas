@@ -74,6 +74,22 @@ extension String : ConvertibleToNSColor {
     }
 }
 
+extension NSColor {
+    
+    convenience init(_ r:Int, _ g:Int, _ b:Int, _ a:Int = 255) {
+        self.init(
+            calibratedRed: CGFloat(r)/255.0,
+            green: CGFloat(g)/255.0,
+            blue: CGFloat(b)/255.0,
+            alpha: CGFloat(a)/255.0)
+    }
+    
+}
+
+func C(r:Int, _ g:Int, _ b:Int, _ a:Int = 255) -> NSColor {
+    return NSColor(r,g,b,a)
+}
+
 struct X11Colors {
 
     static let sharedInstance = X11Colors(namePrettifier: { $0.lowercaseString })
