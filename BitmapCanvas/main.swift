@@ -161,6 +161,19 @@ func image() {
     b.save("/tmp/image.png", open:true)
 }
 
+func polygon() {
+    
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
+    
+    b.setAllowsAntialiasing(true)
+    
+    let points = [P(3,3), P(28,5), P(25,22), P(12,18)]
+    
+    b.polygon(points, stroke:"blue", fill:"SkyBlue")
+    
+    b.save("/tmp/polygon.png", open:true)
+}
+
 func bezier() {
     
     let b = BitmapCanvas(32, 32, "PapayaWhip")
@@ -250,33 +263,20 @@ func voronoi() {
     b.save("/tmp/voronoi.png", open:true)
 }
 
-func polygon() {
-    
-    let b = BitmapCanvas(256, 256)
-    
-    b.setAllowsAntialiasing(true)
-    
-    let points = [P(40,60), P(40,100), P(110,200), P(200,120)]
-    
-    b.polygon(points, stroke:"blue", fill:"yellow")
-    
-    b.save("/tmp/polygon.png", open:true)
-}
+//switzerland()
 
-switzerland()
-
-//bitmap()
-//points()
-//lines()
-//rects()
-//ellipse()
-//text()
-//image()
-//bezier()
-//cgContext()
-//colors()
+bitmap()
+points()
+lines()
+rects()
+ellipse()
+text()
+image()
+bezier()
+cgContext()
+colors()
 voronoi()
-//polygon()
+polygon()
 
 //let b = BitmapCanvas(6000,6000, "SkyBlue")
 //b.fill(P(270,243), color: NSColor.blueColor())
