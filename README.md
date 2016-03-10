@@ -79,6 +79,20 @@ b.text("hello", P(20,30),
 </TR>
 
 <TR>
+    <TD><IMG SRC="img/polygon.png" /></TD>
+    <TD><PRE>let b = BitmapCanvas(32, 32, "PapayaWhip")
+
+b.setAllowsAntialiasing(true)
+
+let points = [P(3,3), P(28,5), P(25,22), P(12,18)]
+
+b.polygon(points, stroke:"blue", fill:"SkyBlue")
+
+b.save("/tmp/polygon.png", open:true)</PRE>
+    </TD>
+</TR>
+
+<TR>
     <TD><IMG SRC="img/bezier.png" /></TD>
     <TD><PRE>b.setAllowsAntialiasing(true)
 
