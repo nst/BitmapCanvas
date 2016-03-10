@@ -90,6 +90,10 @@ func C(r:Int, _ g:Int, _ b:Int, _ a:Int = 255) -> NSColor {
     return NSColor(r,g,b,a)
 }
 
+func C(r:CGFloat, _ g:CGFloat, _ b:CGFloat, _ a:CGFloat = 255.0) -> NSColor {
+    return NSColor(calibratedRed: r, green: g, blue: b, alpha: a)
+}
+
 struct X11Colors {
 
     static let sharedInstance = X11Colors(namePrettifier: { $0.lowercaseString })
