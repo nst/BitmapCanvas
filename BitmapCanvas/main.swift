@@ -209,20 +209,22 @@ func colors() {
     b.save("/tmp/colors.png", open:true)
 }
 
-func voronoi(w w:Int, h:Int, n:Int) {
+func voronoi() {
     
-    var b = BitmapCanvas(w, h)
+    let n = 25
+    
+    var b = BitmapCanvas(256, 256)
     
     var pointsColors : [(NSPoint, NSColor)] = []
     
     for _ in 0...n {
-        let p = P(CGFloat(arc4random_uniform((UInt32(w+1)))), CGFloat(arc4random_uniform((UInt32(h+1)))))
+        let p = P(CGFloat(arc4random_uniform((UInt32(b.width+1)))), CGFloat(arc4random_uniform((UInt32(b.height+1)))))
         let c = C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
         pointsColors.append((p,c))
     }
     
-    for x in 0...w {
-        for y in 0...h {
+    for x in 0...Int(b.width) {
+        for y in 0...Int(b.height) {
             
             var dmin = CGFloat.max
             var color = NSColor.clearColor()
@@ -247,6 +249,18 @@ func voronoi(w w:Int, h:Int, n:Int) {
     b.save("/tmp/voronoi.png", open:true)
 }
 
+func polygon() {
+    
+    let b = BitmapCanvas(256, 256)
+    
+    b.setAllowsAntialiasing(true)
+    
+    let points = [P(40,60), P(40,100), P(110,200), P(200,120)]
+    
+    b.polygon(points, stroke:"blue", fill:"yellow")
+    
+    b.save("/tmp/polygon.png", open:true)
+}
 
 //switzerland()
 
@@ -260,7 +274,8 @@ image()
 bezier()
 cgContext()
 colors()
-//voronoi(w:256, h:256, n:25)
+voronoi()
+polygon()
 
 //let b = BitmapCanvas(6000,6000, "SkyBlue")
 //b.fill(P(270,243), color: NSColor.blueColor())

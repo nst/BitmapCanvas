@@ -336,6 +336,38 @@ struct BitmapCanvas {
         context.restoreGraphicsState()
     }
     
+    func polygon(points:[NSPoint], stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {
+        
+        guard points.count >= 3 else {
+            assertionFailure("at least 3 points are needed")
+            return
+        }
+        
+        context.saveGraphicsState()
+
+        let path = NSBezierPath()
+        
+        path.moveToPoint(points[0])
+
+        for i in 1...points.count-1 {
+            path.lineToPoint(points[i])
+        }
+
+        if let existingFillColor = fill_?.color {
+            existingFillColor.setFill()
+            path.fill()
+        }
+
+        path.closePath()
+
+        if let existingStrokeColor = stroke_?.color {
+            existingStrokeColor.setStroke()
+            path.stroke()
+        }
+        
+        context.restoreGraphicsState()
+    }
+    
     func ellipse(rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {
         
         let strokeColor = stroke_?.color
