@@ -209,16 +209,16 @@ func cgContext() {
     b.save("/tmp/cgcontext.png")
 }
 
-func colors() {
+func gradient() {
     
-    var b = BitmapCanvas(255, 255)
-    for i in 0...255 {
-        for j in 0...255 {
-            b[i,j] = NSColor(i,j,100)
-        }
+var b = BitmapCanvas(255, 255)
+for i in 0...255 {
+    for j in 0...255 {
+        b[i,j] = NSColor(i,j,100)
     }
-    
-    b.save("/tmp/colors.png", open:true)
+}
+
+b.save("/tmp/gradient.png", open:true)
 }
 
 func voronoi() {
@@ -226,17 +226,17 @@ func voronoi() {
     let w = 255
     let h = 255
     let n = 25
-    
+
     var b = BitmapCanvas(w, h)
-    
+
     var pointsColors : [(NSPoint, NSColor)] = []
-    
+
     for _ in 0...n {
         let p = P(CGFloat(arc4random_uniform((UInt32(b.width+1)))), CGFloat(arc4random_uniform((UInt32(b.height+1)))))
         let c = C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
         pointsColors.append((p,c))
     }
-    
+
     for x in 0...w-1 {
         for y in 0...h-1 {
             
@@ -254,12 +254,12 @@ func voronoi() {
             b[x,y] = color
         }
     }
-    
+
     for (p,_) in pointsColors {
         let rect = R(p.x-1, p.y-1, 3, 3)
         b.ellipse(rect, stroke:"black", fill:"black")
     }
-    
+
     b.save("/tmp/voronoi.png", open:true)
 }
 
@@ -274,9 +274,10 @@ text()
 image()
 bezier()
 cgContext()
-colors()
-voronoi()
 polygon()
+
+gradient()
+voronoi()
 
 //let b = BitmapCanvas(6000,6000, "SkyBlue")
 //b.fill(P(270,243), color: NSColor.blueColor())
