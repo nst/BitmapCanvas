@@ -23,8 +23,7 @@ func switzerland() {
     
     b.image(fromPath: "/Users/nst/Projects/BitmapCanvas/files/switzerland.gif", P(0,0))
     
-    let font = NSFont(name: "Monaco", size: 10)!
-    b.text("2016-02-28 \"Pas de spéculation sur les denrées alimentaires\"", P(5,220), font:font)
+    b.text("2016-02-28 \"Pas de spéculation sur les denrées alimentaires\"", P(5,220))
     
     let values : [Double] = results.flatMap { (k,v) in v as? Double }
     
@@ -211,9 +210,11 @@ func colors() {
 
 func voronoi() {
     
+    let w = 255
+    let h = 255
     let n = 25
     
-    var b = BitmapCanvas(256, 256)
+    var b = BitmapCanvas(w, h)
     
     var pointsColors : [(NSPoint, NSColor)] = []
     
@@ -223,14 +224,14 @@ func voronoi() {
         pointsColors.append((p,c))
     }
     
-    for x in 0...Int(b.width) {
-        for y in 0...Int(b.height) {
+    for x in 0...w-1 {
+        for y in 0...h-1 {
             
             var dmin = CGFloat.max
             var color = NSColor.clearColor()
             
             for (p,c) in pointsColors {
-                let d = hypot(p.x-x, p.y-y)
+                let d = hypot(p.x - x, p.y - y)
                 if d < dmin {
                     dmin = d
                     color = c
@@ -242,7 +243,7 @@ func voronoi() {
     }
     
     for (p,_) in pointsColors {
-        let rect = R(p.x-2, p.y-2, 4, 4)
+        let rect = R(p.x-1, p.y-1, 3, 3)
         b.ellipse(rect, stroke:"black", fill:"black")
     }
     
@@ -262,23 +263,23 @@ func polygon() {
     b.save("/tmp/polygon.png", open:true)
 }
 
-//switzerland()
+switzerland()
 
-bitmap()
-points()
-lines()
-rects()
-ellipse()
-text()
-image()
-bezier()
-cgContext()
-colors()
+//bitmap()
+//points()
+//lines()
+//rects()
+//ellipse()
+//text()
+//image()
+//bezier()
+//cgContext()
+//colors()
 voronoi()
-polygon()
+//polygon()
 
 //let b = BitmapCanvas(6000,6000, "SkyBlue")
 //b.fill(P(270,243), color: NSColor.blueColor())
 //b.save("/tmp/out.png", open: true)
 
-X11Colors.dump("/opt/X11/share/X11/rgb.txt", outPath:"/tmp/X11.clr")
+//X11Colors.dump("/opt/X11/share/X11/rgb.txt", outPath:"/tmp/X11.clr")
