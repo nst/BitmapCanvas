@@ -451,7 +451,7 @@ struct BitmapCanvas {
         context.restoreGraphicsState()
     }
     
-    func text(text:String, _ p:NSPoint, rotationRadians:CGFloat?, font : NSFont = NSFont(name: "Monaco", size: 10)!, color color_ : ConvertibleToNSColor = NSColor.blackColor(), allowsAntialiasing : Bool = false) {
+    func text(text:String, _ p:NSPoint, rotationRadians:CGFloat?, font : NSFont = NSFont(name: "Monaco", size: 10)!, color color_ : ConvertibleToNSColor = NSColor.blackColor()) {
         
         let color = color_.color
         
@@ -470,15 +470,13 @@ struct BitmapCanvas {
         
         CGContextScaleCTM(cgContext, 1.0, -1.0)
         CGContextTranslateCTM(cgContext, 0.0, -2.0 * p.y - font.pointSize)
-        
-        CGContextSetAllowsAntialiasing(cgContext, allowsAntialiasing)
-        
+                
         text.drawAtPoint(p, withAttributes: attr)
         
         context.restoreGraphicsState()
     }
     
-    func text(text:String, _ p:NSPoint, rotationDegrees degrees:CGFloat = 0.0, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : ConvertibleToNSColor = NSColor.blackColor(), allowsAntialiasing : Bool = false) {
+    func text(text:String, _ p:NSPoint, rotationDegrees degrees:CGFloat = 0.0, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : ConvertibleToNSColor = NSColor.blackColor()) {
         self.text(text, p, rotationRadians: degreesToRadians(degrees), font: font, color: color)
     }
 }
