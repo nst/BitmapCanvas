@@ -72,7 +72,7 @@ func R(x:Int, _ y:Int, _ w:Int, _ h:Int) -> NSRect {
     return NSMakeRect(CGFloat(x), CGFloat(y), CGFloat(w), CGFloat(h))
 }
 
-struct BitmapCanvas {
+class BitmapCanvas {
     
     let bitmapImageRep : NSBitmapImageRep
     let context : NSGraphicsContext
@@ -336,7 +336,7 @@ struct BitmapCanvas {
         context.restoreGraphicsState()
     }
     
-    func polygon(points:[NSPoint], stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {
+    func polygon(points:[NSPoint], stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), lineWidth:CGFloat=1.0, fill fill_:ConvertibleToNSColor? = nil) {
         
         guard points.count >= 3 else {
             assertionFailure("at least 3 points are needed")
@@ -344,24 +344,25 @@ struct BitmapCanvas {
         }
         
         context.saveGraphicsState()
-
+        
         let path = NSBezierPath()
         
         path.moveToPoint(points[0])
-
+        
         for i in 1...points.count-1 {
             path.lineToPoint(points[i])
         }
-
+        
         if let existingFillColor = fill_?.color {
             existingFillColor.setFill()
             path.fill()
         }
-
+        
         path.closePath()
-
+        
         if let existingStrokeColor = stroke_?.color {
             existingStrokeColor.setStroke()
+            path.lineWidth = lineWidth
             path.stroke()
         }
         
@@ -470,7 +471,7 @@ struct BitmapCanvas {
         
         CGContextScaleCTM(cgContext, 1.0, -1.0)
         CGContextTranslateCTM(cgContext, 0.0, -2.0 * p.y - font.pointSize)
-                
+        
         text.drawAtPoint(p, withAttributes: attr)
         
         context.restoreGraphicsState()
