@@ -92,7 +92,7 @@ func bitmap() {
 
 func points() {
     
-    var b = BitmapCanvas(32, 32, "PapayaWhip")
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
     
     b[1,1] = NSColor.blackColor()
     
@@ -213,7 +213,7 @@ func gradient() {
 
     let (w, h) = (255, 255)
 
-    var b = BitmapCanvas(w, h)
+    let b = BitmapCanvas(w, h)
     for i in 0...w-1 {
         for j in 0...h-1 {
             b[i,j] = NSColor(i,j,100)
@@ -229,7 +229,7 @@ func voronoi() {
     let h = 255
     let n = 25
     
-    var b = BitmapCanvas(w, h)
+    let b = BitmapCanvas(w, h)
     
     var pointsColors : [(NSPoint, NSColor)] = []
     

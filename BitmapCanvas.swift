@@ -8,14 +8,6 @@
 
 import Cocoa
 
-var Crayons = NSColorList(named: "Crayons")!
-
-extension NSColorList {
-    subscript (key:String) -> NSColor {
-        return self.colorWithKey(key)!
-    }
-}
-
 infix operator * { associativity right precedence 155 }
 
 func *(left:CGFloat, right:Int) -> CGFloat
@@ -401,7 +393,7 @@ class BitmapCanvas {
     
     func save(path:String, open:Bool=false) -> Bool {
         guard let data = bitmapImageRep.representationUsingType(.NSPNGFileType, properties: [:]) else {
-            print("\(__FILE__) \(__FUNCTION__) cannot get PNG data from bitmap")
+            print("\(#file) \(#function) cannot get PNG data from bitmap")
             return false
         }
         let success = data.writeToFile(path, atomically: false)
@@ -413,7 +405,7 @@ class BitmapCanvas {
         return success
     }
     
-    private func textWidth(text:NSString, font:NSFont) -> CGFloat {
+    static func textWidth(text:NSString, font:NSFont) -> CGFloat {
         let maxSize : CGSize = CGSizeMake(CGFloat.max, font.pointSize)
         let textRect : CGRect = text.boundingRectWithSize(
             maxSize,
@@ -426,17 +418,17 @@ class BitmapCanvas {
     func image(fromPath path:String, _ p:NSPoint) {
         
         guard let data = NSData(contentsOfFile:path) else {
-            print("\(__FILE__) \(__FUNCTION__) cannot read data at \(path)");
+            print("\(#file) \(#function) cannot read data at \(path)");
             return
         }
         
         guard let imgRep = NSBitmapImageRep(data: data) else {
-            print("\(__FILE__) \(__FUNCTION__) cannot create bitmap image rep from data at \(path)");
+            print("\(#file) \(#function) cannot create bitmap image rep from data at \(path)");
             return
         }
         
         guard let cgImage = imgRep.CGImage else {
-            print("\(__FILE__) \(__FUNCTION__) cannot get cgImage out of imageRep from \(path)");
+            print("\(#file) \(#function) cannot get cgImage out of imageRep from \(path)");
             return
         }
         
