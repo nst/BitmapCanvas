@@ -5,7 +5,7 @@ __Description__
 
 A clear, simple and concise API over a CoreGraphics bitmap context.  
 Loosely inspired by the ImageDraw Python library.  
-Especially useful for easy [data](files/switzerland.png) [visualizations](https://github.com/nst/DevTeamActivity).
+Especially useful for easy [data](https://github.com/nst/DevTeamActivity) [visualizations](https://github.com/nst/ShapefileReader).
 
 __Features__
 
