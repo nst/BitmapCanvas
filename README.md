@@ -10,7 +10,7 @@ Especially useful for easy [data](https://github.com/nst/DevTeamActivity) [visua
 __Features__
 
 * upper-left corner based coordinates
-* pixel perfect drawing of points, lines, rectangles and texts
+* pixel perfect drawing of points, lines, rectangles, ellipses and texts
 * colors as NSColor, hex strings ``"#AA00DF"`` or X11 names ``"SkyBlue"``
 * save as PNG
 * usable with regular CoreGraphics code
