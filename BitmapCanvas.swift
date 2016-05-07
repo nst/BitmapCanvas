@@ -56,6 +56,10 @@ func P(x:CGFloat, _ y: CGFloat) -> NSPoint {
     return NSMakePoint(x, y)
 }
 
+func RandomPoint(maxX maxX:Int, maxY:Int) -> NSPoint {
+    return P(CGFloat(arc4random_uniform((UInt32(maxX+1)))), CGFloat(arc4random_uniform((UInt32(maxY+1)))))
+}
+
 func R(x:CGFloat, _ y:CGFloat, _ w:CGFloat, _ h:CGFloat) -> NSRect {
     return NSMakeRect(x, y, w, h)
 }

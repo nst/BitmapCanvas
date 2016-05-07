@@ -141,9 +141,9 @@ func ellipse() {
 func text() {
     
     let b = BitmapCanvas(32, 32, "PapayaWhip")
-    
+
     b.text("hi", P(5,10))
-    
+
     b.text("hello", P(20,30),
         rotationDegrees: -90,
         font: NSFont(name: "Helvetica", size: 10)!,
@@ -234,26 +234,15 @@ func voronoi() {
     var pointsColors : [(NSPoint, NSColor)] = []
     
     for _ in 0...n {
-        let p = P(CGFloat(arc4random_uniform((UInt32(b.width+1)))), CGFloat(arc4random_uniform((UInt32(b.height+1)))))
-        let c = C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
+        let p = RandomPoint(maxX: w, maxY: h)
+        let c = NSColor.randomColor()
         pointsColors.append((p,c))
     }
     
     for x in 0...w-1 {
         for y in 0...h-1 {
-            
-            var dmin = CGFloat.max
-            var color = NSColor.clearColor()
-            
-            for (p,c) in pointsColors {
-                let d = hypot(p.x - x, p.y - y)
-                if d < dmin {
-                    dmin = d
-                    color = c
-                }
-            }
-            
-            b[x,y] = color
+            let distances = pointsColors.map { hypot($0.0.x - x, $0.0.y - y) }
+            b[x,y] = pointsColors[distances.indexOf(distances.minElement()!)!].1
         }
     }
     
@@ -265,7 +254,7 @@ func voronoi() {
     b.save("/tmp/voronoi.png", open:true)
 }
 
-//switzerland()
+switzerland()
 
 bitmap()
 points()
