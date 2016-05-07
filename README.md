@@ -145,8 +145,8 @@ Other images with sample code:
 let (w, h) = (255, 255)
 
 let b = BitmapCanvas(w, h)
-for i in 0...w-1 {
-    for j in 0...h-1 {
+for i in 0..<w {
+    for j in 0..<h {
         b[i,j] = NSColor(i,j,100)
     }
 }

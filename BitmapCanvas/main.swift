@@ -214,8 +214,8 @@ func gradient() {
     let (w, h) = (255, 255)
 
     let b = BitmapCanvas(w, h)
-    for i in 0...w-1 {
-        for j in 0...h-1 {
+    for i in 0..<w {
+        for j in 0..<h {
             b[i,j] = NSColor(i,j,100)
         }
     }
@@ -239,8 +239,8 @@ func voronoi() {
         pointsColors.append((p,c))
     }
     
-    for x in 0...w-1 {
-        for y in 0...h-1 {
+    for x in 0..<w {
+        for y in 0..<h {
             let distances = pointsColors.map { hypot($0.0.x - x, $0.0.y - y) }
             b[x,y] = pointsColors[distances.indexOf(distances.minElement()!)!].1
         }
