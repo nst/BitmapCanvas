@@ -144,14 +144,14 @@ Other images with sample code:
 ```Swift
 let (w, h) = (255, 255)
 
-var b = BitmapCanvas(w, h)
+let b = BitmapCanvas(w, h)
 for i in 0...w-1 {
     for j in 0...h-1 {
         b[i,j] = NSColor(i,j,100)
     }
 }
 
-b.save("/tmp/gradient.png", open:true)
+b.save("/tmp/gradient.png")
 ```
 
 ![voronoi](img/voronoi.png "Voronoi")
@@ -161,31 +161,20 @@ let w = 255
 let h = 255
 let n = 25
 
-var b = BitmapCanvas(w, h)
+let b = BitmapCanvas(w, h)
 
 var pointsColors : [(NSPoint, NSColor)] = []
 
 for _ in 0...n {
-    let p = P(CGFloat(arc4random_uniform((UInt32(b.width+1)))), CGFloat(arc4random_uniform((UInt32(b.height+1)))))
-    let c = C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
+    let p = RandomPoint(maxX: w, maxY: h)
+    let c = NSColor.randomColor()
     pointsColors.append((p,c))
 }
 
 for x in 0...w-1 {
     for y in 0...h-1 {
-        
-        var dmin = CGFloat.max
-        var color = NSColor.clearColor()
-        
-        for (p,c) in pointsColors {
-            let d = hypot(p.x - x, p.y - y)
-            if d < dmin {
-                dmin = d
-                color = c
-            }
-        }
-        
-        b[x,y] = color
+        let distances = pointsColors.map { hypot($0.0.x - x, $0.0.y - y) }
+        b[x,y] = pointsColors[distances.indexOf(distances.minElement()!)!].1
     }
 }
 
