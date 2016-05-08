@@ -52,8 +52,12 @@ func -(left:Double, right:CGFloat) -> CGFloat
 
 //
 
-func P(x:CGFloat, _ y: CGFloat) -> NSPoint {
+func P(x:CGFloat, _ y:CGFloat) -> NSPoint {
     return NSMakePoint(x, y)
+}
+
+func P(x:Int, _ y:Int) -> NSPoint {
+    return NSMakePoint(CGFloat(x), CGFloat(y))
 }
 
 func RandomPoint(maxX maxX:Int, maxY:Int) -> NSPoint {

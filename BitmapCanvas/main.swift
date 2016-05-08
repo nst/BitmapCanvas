@@ -9,19 +9,21 @@
 import Foundation
 import AppKit
 
+let PROJECT_PATH = "/Users/nst/Projects/BitmapCanvas"
+
 func switzerland() {
     
-    guard let resultsData = NSData(contentsOfFile: "/Users/nst/Projects/BitmapCanvas/files/results.json") else { return }
+    guard let resultsData = NSData(contentsOfFile: PROJECT_PATH+"/files/results.json") else { return }
     guard let optResults = try? NSJSONSerialization.JSONObjectWithData(resultsData, options: []) as? [String:AnyObject] else { return }
     guard let results = optResults else { return }
     
-    guard let switzerlandData = NSData(contentsOfFile: "/Users/nst/Projects/BitmapCanvas/files/switzerland.json") else { return }
+    guard let switzerlandData = NSData(contentsOfFile: PROJECT_PATH+"/files/switzerland.json") else { return }
     guard let optSwitzerland = try? NSJSONSerialization.JSONObjectWithData(switzerlandData, options: []) as? [String:AnyObject] else { return }
     guard let switzerland = optSwitzerland else { return }
     
     let b = BitmapCanvas(365, 235, "white")
     
-    b.image(fromPath: "/Users/nst/Projects/BitmapCanvas/files/switzerland.gif", P(0,0))
+    b.image(fromPath: PROJECT_PATH+"/files/switzerland.gif", P(0,0))
     
     b.text("2016-02-28 \"Pas de spéculation sur les denrées alimentaires\"", P(5,220))
     
@@ -64,17 +66,13 @@ func switzerland() {
         let fillPoints = cantonDict["fill"] as? [[Int]] ?? [labelPoint]
         
         for pts in fillPoints {
-            let px = pts[0]
-            let py = pts[1]
-            let p = P(CGFloat(px), CGFloat(py))
+            let p = P(pts[0], pts[1])
             b.fill(p, color: fillColor)
         }
         
         // draw labels
-        
-        let px = labelPoint[0]
-        let py = labelPoint[1]
-        let p = P(CGFloat(px), CGFloat(py))
+
+        let p = P(labelPoint[0], labelPoint[1])
         b.text(k, p)
     }
     
