@@ -189,7 +189,7 @@ b.save("/tmp/voronoi.png")
 <a href="https://github.com/nst/BitmapCanvas/raw/master/files/piwalk.png"><img src="https://github.com/nst/BitmapCanvas/raw/master/files/piwalk_small.png"></a>
 
 ```Swift
-// https://www.washingtonpost.com/news/wonk/wp/2015/03/14/10-stunning-images-show-the-beauty-hidden-in-pi/
+// http://www.visualcinnamon.com/2015/01/exploring-art-hidden-in-pi.html
 
 let (w,h) = (2500,2300)
 
