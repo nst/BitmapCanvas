@@ -294,7 +294,15 @@ class BitmapCanvas {
         
         context.restoreGraphicsState()
     }
-    
+
+    func line(p1:NSPoint, length:CGFloat = 1.0, degreesCW:CGFloat = 0.0, _ color_:ConvertibleToNSColor? = NSColor.blackColor()) -> NSPoint {
+        let color = color_?.color
+        let radians = degreesToRadians(degreesCW)
+        let p2 = P(p1.x + sin(radians) * length, p1.y - cos(radians) * length)
+        self.line(p1, p2, color)
+        return p2
+    }
+
     func lineVertical(p1:NSPoint, height:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
         let color = color_?.color
         let p2 = P(p1.x, p1.y + height - 1)
