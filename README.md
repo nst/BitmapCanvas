@@ -186,7 +186,7 @@ for (p,_) in pointsColors {
 b.save("/tmp/voronoi.png")
 ```
 
-<a href="https://github.com/nst/BitmapCanvas/raw/master/files/piwalk.png"><img src="https://github.com/nst/BitmapCanvas/raw/master/files/piwalk_small.png"></a>
+![pi walk](img/piwalk.png "pi walk")
 
 ```Swift
 // http://www.visualcinnamon.com/2015/01/exploring-art-hidden-in-pi.html
