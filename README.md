@@ -203,9 +203,9 @@ b.setAllowsAntialiasing(true)
 let path = PROJECT_PATH+"/files/1000000.txt"
 
 guard let
-data = NSFileManager.defaultManager().contentsAtPath(path),
-s = NSString(data: data, encoding: NSASCIIStringEncoding) as? String else {
-assertionFailure(); return
+    data = NSFileManager.defaultManager().contentsAtPath(path),
+    s = NSString(data: data, encoding: NSASCIIStringEncoding) as? String else {
+        assertionFailure(); return
 }
 
 let ints = s.characters.flatMap { Int(String($0)) }
@@ -213,9 +213,9 @@ let ints = s.characters.flatMap { Int(String($0)) }
 // setup colors + origin
 
 let palette = [C(233,154,0),C(232,139,0),C(230,101,0),C(266,58,7),C(215,15,25),
-C(206,0,35),C(191,0,48),C(173,0,62),C(154,0,78),C(137,0,96),
-C(119,16,116),C(95,38,133),C(71,51,149),C(52,73,148),C(33,96,137),
-C(20,118,121),C(23,140,97),C(33,157,79),C(73,167,70),C(101,174,62)]
+               C(206,0,35),C(191,0,48),C(173,0,62),C(154,0,78),C(137,0,96),
+               C(119,16,116),C(95,38,133),C(71,51,149),C(52,73,148),C(33,96,137),
+               C(20,118,121),C(23,140,97),C(33,157,79),C(73,167,70),C(101,174,62)]
 
 let origin = P(600, 300)
 var p = origin
@@ -223,9 +223,9 @@ var p = origin
 // walk and draw
 
 for (c, i) in ints.enumerate() {
-let paletteIndex = Int(Double(c) / Double(ints.count) * Double(palette.count))
-let color = palette[paletteIndex]
-p = b.line(p, length:2, degreesCW:36.0 * i, color)
+    let paletteIndex = Int(Double(c) / Double(ints.count) * Double(palette.count))
+    let color = palette[paletteIndex]
+    p = b.line(p, length:2, degreesCW:36.0 * i, color)
 }
 
 // highlight starting point
@@ -251,9 +251,9 @@ let compassOrigin = P(legendPoint.x + 400, legendPoint.y + 600)
 b.context.saveGraphicsState()
 CGContextSetLineWidth(b.cgContext, 10.0)
 for degrees in 0.stride(to: 360, by: 36) {
-let p2 = b.line(compassOrigin, length:200, degreesCW:CGFloat(degrees), "white")
-b.text(String(Int(Double(degrees)/36.0)), P(p2.x, p2.y), rotationDegrees: CGFloat(degrees), font: font, color: "DarkGrey")
-b.line(compassOrigin, length:140, degreesCW:CGFloat(degrees), "DarkGrey")
+    let p2 = b.line(compassOrigin, length:200, degreesCW:CGFloat(degrees), "white")
+    b.text(String(Int(Double(degrees)/36.0)), P(p2.x, p2.y), rotationDegrees: CGFloat(degrees), font: font, color: "DarkGrey")
+    b.line(compassOrigin, length:140, degreesCW:CGFloat(degrees), "DarkGrey")
 }
 b.context.restoreGraphicsState()
 
@@ -263,7 +263,7 @@ let boxOrigin = P(legendPoint.x, legendPoint.y+1000)
 let boxWidth : CGFloat = 40.0
 let boxHeight : CGFloat = 20.0
 for (i, color) in palette.enumerate() {
-b.rectangle(R(legendPoint.x+Double(i)*boxWidth,legendPoint.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
+    b.rectangle(R(legendPoint.x+Double(i)*boxWidth,legendPoint.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
 }
 
 b.text("start", P(boxOrigin.x, boxOrigin.y - 50), font: font, color: "DarkGrey")
