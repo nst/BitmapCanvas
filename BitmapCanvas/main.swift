@@ -272,20 +272,19 @@ func piWalk() {
         s = NSString(data: data, encoding: NSASCIIStringEncoding) as? String else {
             assertionFailure(); return
     }
-
+    
     let ints = s.characters.flatMap { Int(String($0)) }
-
+    
     // setup colors + origin
     
     let palette = [C(233,154,0),C(232,139,0),C(230,101,0),C(266,58,7),C(215,15,25),
                    C(206,0,35),C(191,0,48),C(173,0,62),C(154,0,78),C(137,0,96),
                    C(119,16,116),C(95,38,133),C(71,51,149),C(52,73,148),C(33,96,137),
                    C(20,118,121),C(23,140,97),C(33,157,79),C(73,167,70),C(101,174,62)]
-
     
     let origin = P(600, 300)
     var p = origin
-
+    
     // walk and draw
     
     for (c, i) in ints.enumerate() {
@@ -293,22 +292,22 @@ func piWalk() {
         let color = palette[paletteIndex]
         p = b.line(p, length:2, degreesCW:36.0 * i, color)
     }
-
+    
     // highlight starting point
     
     b.setAllowsAntialiasing(false)
     
     b.ellipse(R(origin.x-4, origin.y-4, 8, 8), stroke: "black", fill: "black")
-
+    
     // legend
     
     let legendPoint = P(1500,1100)
-
+    
     // legend - pi
     
     let fontPi = NSFont(name: "Times", size: 384)!
     let font = NSFont(name: "Times", size: 48)!
-
+    
     b.text("π", P(legendPoint.x+300,legendPoint.y), font: fontPi)
     
     // legend - compass
@@ -322,7 +321,7 @@ func piWalk() {
         b.line(compassOrigin, length:140, degreesCW:CGFloat(degrees), "DarkGrey")
     }
     b.context.restoreGraphicsState()
-
+    
     // legend - color scale
     
     let boxOrigin = P(legendPoint.x, legendPoint.y+1000)
