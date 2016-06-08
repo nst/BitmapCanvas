@@ -62,6 +62,19 @@ b.ellipse(R(10,10,18,21), stroke:"blue", fill:"magenta")</PRE>
 </TR>
 
 <TR>
+    <TD><IMG SRC="img/fill.png" /></TD>
+    <TD><PRE>let b = BitmapCanvas(32, 32, "PapayaWhip")
+
+b.line(P(10,0), P(25,31), "red")
+
+b.ellipse(R(15,10,15,15))
+
+b.fill(P(30,1), color:"yellow")
+</PRE>
+    </TD>
+</TR>
+
+<TR>
     <TD><IMG SRC="img/text.png" /></TD>
     <TD><PRE>b.text("hi", P(5,10))
 
