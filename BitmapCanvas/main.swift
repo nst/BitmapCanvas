@@ -295,9 +295,9 @@ func piWalk() {
     
     // highlight starting point
     
-    b.setAllowsAntialiasing(false)
-    
     b.ellipse(R(origin.x-4, origin.y-4, 8, 8), stroke: "black", fill: "black")
+    
+    b.setAllowsAntialiasing(true)
     
     // legend
     
