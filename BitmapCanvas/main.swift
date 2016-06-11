@@ -136,6 +136,19 @@ func ellipse() {
     b.save("/tmp/ellipse.png", open:true)
 }
 
+func fill() {
+    
+    let b = BitmapCanvas(32, 32, "PapayaWhip")
+    
+    b.line(P(10,0), P(25,31), "red")
+    
+    b.ellipse(R(15,10,15,15))
+    
+    b.fill(P(30,1), color:"yellow")
+    
+    b.save("/tmp/fill.png")
+}
+
 func text() {
     
     let b = BitmapCanvas(32, 32, "PapayaWhip")
@@ -347,6 +360,7 @@ points()
 lines()
 rects()
 ellipse()
+fill()
 text()
 image()
 bezier()
