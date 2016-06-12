@@ -265,11 +265,9 @@ func voronoi() {
     b.save("/tmp/voronoi.png", open:true)
 }
 
-func piWalk() {
-    
+
+func walkAndDraw(width w:Int, height h:Int, walkOrigin:CGPoint, legendOrigin:CGPoint, digitsFilePath:String, title:String, outFilePath:String) {
     // http://www.visualcinnamon.com/2015/01/exploring-art-hidden-in-pi.html
-    
-    let (w,h) = (2500,2300)
     
     let b = BitmapCanvas(w,h, "white")
     
@@ -277,11 +275,8 @@ func piWalk() {
     
     // read data
     
-    // https://www.angio.net/pi/digits.html
-    let path = PROJECT_PATH+"/files/1000000.txt"
-    
     guard let
-        data = NSFileManager.defaultManager().contentsAtPath(path),
+        data = NSFileManager.defaultManager().contentsAtPath(digitsFilePath),
         s = NSString(data: data, encoding: NSASCIIStringEncoding) as? String else {
             assertionFailure(); return
     }
@@ -295,8 +290,7 @@ func piWalk() {
                    C(119,16,116),C(95,38,133),C(71,51,149),C(52,73,148),C(33,96,137),
                    C(20,118,121),C(23,140,97),C(33,157,79),C(73,167,70),C(101,174,62)]
     
-    let origin = P(600, 300)
-    var p = origin
+    var p = walkOrigin
     
     // walk and draw
     
@@ -308,24 +302,22 @@ func piWalk() {
     
     // highlight starting point
     
-    b.ellipse(R(origin.x-4, origin.y-4, 8, 8), stroke: "black", fill: "black")
+    b.ellipse(R(walkOrigin.x-4, walkOrigin.y-4, 8, 8), stroke: "black", fill: "black")
     
     b.setAllowsAntialiasing(true)
     
     // legend
     
-    let legendPoint = P(1500,1100)
+    // legend - title
     
-    // legend - pi
-    
-    let fontPi = NSFont(name: "Times", size: 384)!
+    let fontTitle = NSFont(name: "Times", size: 384)!
     let font = NSFont(name: "Times", size: 48)!
     
-    b.text("π", P(legendPoint.x+300,legendPoint.y), font: fontPi)
+    b.text(title, P(legendOrigin.x+300,legendOrigin.y), font: fontTitle)
     
     // legend - compass
     
-    let compassOrigin = P(legendPoint.x + 400, legendPoint.y + 600)
+    let compassOrigin = P(legendOrigin.x + 400, legendOrigin.y + 600)
     b.context.saveGraphicsState()
     CGContextSetLineWidth(b.cgContext, 10.0)
     for degrees in 0.stride(to: 360, by: 36) {
@@ -337,20 +329,20 @@ func piWalk() {
     
     // legend - color scale
     
-    let boxOrigin = P(legendPoint.x, legendPoint.y+1000)
+    let boxOrigin = P(legendOrigin.x, legendOrigin.y+1000)
     let boxWidth : CGFloat = 40.0
     let boxHeight : CGFloat = 20.0
     for (i, color) in palette.enumerate() {
-        b.rectangle(R(legendPoint.x+Double(i)*boxWidth,legendPoint.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
+        b.rectangle(R(legendOrigin.x+Double(i)*boxWidth,legendOrigin.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
     }
     
     b.text("start", P(boxOrigin.x, boxOrigin.y - 50), font: font, color: "DarkGrey")
     b.text("end", P(boxOrigin.x + boxWidth * palette.count - 60, boxOrigin.y - 50), font: font, color: "DarkGrey")
     
-    let filename = (path as NSString).lastPathComponent
+    let filename = (digitsFilePath as NSString).lastPathComponent
     b.text(filename, P(boxOrigin.x + 300, boxOrigin.y - 50), font: font, color: "DarkGrey")
     
-    b.save("/tmp/piwalk.png", open: true)
+    b.save(outFilePath, open: true)
 }
 
 switzerland()
@@ -370,7 +362,13 @@ polygon()
 gradient()
 voronoi()
 
-//piWalk()
+// pi
+// https://www.angio.net/pi/digits.html
+//walkAndDraw(width:2500, height:2300, walkOrigin:P(600,300), legendOrigin:P(1500,1100), digitsFilePath:PROJECT_PATH+"/files/pi_1000000.txt", title:"π", outFilePath:"/tmp/pi_walk.png")
+
+// e
+// http://apod.nasa.gov/htmltest/gifcity/e.2mil
+//walkAndDraw(width:3900, height:4800, walkOrigin:P(1600,300), legendOrigin:P(300,300), digitsFilePath:PROJECT_PATH+"/files/e_2000000.txt", title:"e", outFilePath:"/tmp/e_walk.png")
 
 //let b = BitmapCanvas(6000,6000, "SkyBlue")
 //b.fill(P(270,243), color: NSColor.blueColor())
