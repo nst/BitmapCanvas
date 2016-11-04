@@ -8,7 +8,7 @@
 
 import Cocoa
 
-infix operator * { associativity right precedence 155 }
+infix operator * : MultiplicationPrecedence
 
 func *(left:CGFloat, right:Int) -> CGFloat
 { return left * CGFloat(right) }
@@ -22,7 +22,7 @@ func *(left:CGFloat, right:Double) -> CGFloat
 func *(left:Double, right:CGFloat) -> CGFloat
 { return CGFloat(left) * right }
 
-infix operator + { associativity right precedence 145 }
+infix operator + : AdditionPrecedence
 
 func +(left:CGFloat, right:Int) -> CGFloat
 { return left + CGFloat(right) }
@@ -36,7 +36,7 @@ func +(left:CGFloat, right:Double) -> CGFloat
 func +(left:Double, right:CGFloat) -> CGFloat
 { return CGFloat(left) + right }
 
-infix operator - { associativity right precedence 145 }
+infix operator - : AdditionPrecedence
 
 func -(left:CGFloat, right:Int) -> CGFloat
 { return left - CGFloat(right) }
@@ -52,23 +52,23 @@ func -(left:Double, right:CGFloat) -> CGFloat
 
 //
 
-func P(x:CGFloat, _ y:CGFloat) -> NSPoint {
+func P(_ x:CGFloat, _ y:CGFloat) -> NSPoint {
     return NSMakePoint(x, y)
 }
 
-func P(x:Int, _ y:Int) -> NSPoint {
+func P(_ x:Int, _ y:Int) -> NSPoint {
     return NSMakePoint(CGFloat(x), CGFloat(y))
 }
 
-func RandomPoint(maxX maxX:Int, maxY:Int) -> NSPoint {
+func RandomPoint(maxX:Int, maxY:Int) -> NSPoint {
     return P(CGFloat(arc4random_uniform((UInt32(maxX+1)))), CGFloat(arc4random_uniform((UInt32(maxY+1)))))
 }
 
-func R(x:CGFloat, _ y:CGFloat, _ w:CGFloat, _ h:CGFloat) -> NSRect {
+func R(_ x:CGFloat, _ y:CGFloat, _ w:CGFloat, _ h:CGFloat) -> NSRect {
     return NSMakeRect(x, y, w, h)
 }
 
-func R(x:Int, _ y:Int, _ w:Int, _ h:Int) -> NSRect {
+func R(_ x:Int, _ y:Int, _ w:Int, _ h:Int) -> NSRect {
     return NSMakeRect(CGFloat(x), CGFloat(y), CGFloat(w), CGFloat(h))
 }
 
@@ -78,7 +78,7 @@ class BitmapCanvas {
     let context : NSGraphicsContext
     
     var cgContext : CGContext {
-        return context.CGContext
+        return context.cgContext
     }
     
     var width : CGFloat {
@@ -89,8 +89,8 @@ class BitmapCanvas {
         return bitmapImageRep.size.height
     }
     
-    func setAllowsAntialiasing(antialiasing : Bool) {
-        CGContextSetAllowsAntialiasing(cgContext, antialiasing)
+    func setAllowsAntialiasing(_ antialiasing : Bool) {
+        cgContext.setAllowsAntialiasing(antialiasing)
     }
     
     init(_ width:Int, _ height:Int, _ background:ConvertibleToNSColor? = nil) {
@@ -109,7 +109,7 @@ class BitmapCanvas {
         
         self.context = NSGraphicsContext(bitmapImageRep: bitmapImageRep)!
         
-        NSGraphicsContext.setCurrentContext(context)
+        NSGraphicsContext.setCurrent(context)
         
         setAllowsAntialiasing(false)
         
@@ -120,17 +120,17 @@ class BitmapCanvas {
             context.saveGraphicsState()
             
             b.color.setFill()
-            NSBezierPath.fillRect(rect)
+            NSBezierPath.fill(rect)
             
             context.restoreGraphicsState()
         }
         
         // makes coordinates start upper left
-        CGContextTranslateCTM(cgContext, 0, CGFloat(height))
-        CGContextScaleCTM(cgContext, 1.0, -1.0)
+        cgContext.translateBy(x: 0, y: CGFloat(height))
+        cgContext.scaleBy(x: 1.0, y: -1.0)
     }
     
-    private func _colorIsEqual(p:NSPoint, _ pixelBuffer:UnsafePointer<UInt8>, _ rgba:(UInt8,UInt8,UInt8,UInt8)) -> Bool {
+    fileprivate func _colorIsEqual(_ p:NSPoint, _ pixelBuffer:UnsafePointer<UInt8>, _ rgba:(UInt8,UInt8,UInt8,UInt8)) -> Bool {
         
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
         
@@ -147,7 +147,7 @@ class BitmapCanvas {
         return true
     }
     
-    private func _color(p:NSPoint, pixelBuffer:UnsafePointer<UInt8>) -> NSColor {
+    fileprivate func _color(_ p:NSPoint, pixelBuffer:UnsafePointer<UInt8>) -> NSColor {
         
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
         
@@ -163,14 +163,16 @@ class BitmapCanvas {
             alpha: CGFloat(Double(a)/255.0))
     }
     
-    func color(p:NSPoint) -> NSColor {
+    func color(_ p:NSPoint) -> NSColor {
         
-        let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
+        guard let data = cgContext.data else { assertionFailure(); return NSColor.clear }
+        
+        let pixelBuffer = data.assumingMemoryBound(to: UInt8.self)
         
         return _color(p, pixelBuffer:pixelBuffer)
     }
     
-    private func _setColor(p:NSPoint, pixelBuffer:UnsafeMutablePointer<UInt8>, normalizedColor:NSColor) {
+    fileprivate func _setColor(_ p:NSPoint, pixelBuffer:UnsafeMutablePointer<UInt8>, normalizedColor:NSColor) {
         let offset = 4 * ((Int(self.width) * Int(p.y) + Int(p.x)))
         
         pixelBuffer[offset] = UInt8(normalizedColor.redComponent * 255.0)
@@ -179,16 +181,18 @@ class BitmapCanvas {
         pixelBuffer[offset+3] = UInt8(normalizedColor.alphaComponent * 255.0)
     }
     
-    func setColor(p:NSPoint, color color_:ConvertibleToNSColor) {
+    func setColor(_ p:NSPoint, color color_:ConvertibleToNSColor) {
         
         let color = color_.color
         
-        guard let normalizedColor = color.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
+        guard let normalizedColor = color.usingColorSpaceName(NSCalibratedRGBColorSpace) else {
             print("-- cannot normalize color \(color)")
             return
         }
         
-        let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
+        guard let data = cgContext.data else { assertionFailure(); return }
+
+        let pixelBuffer = data.assumingMemoryBound(to: UInt8.self)
         
         _setColor(p, pixelBuffer:pixelBuffer, normalizedColor:normalizedColor)
     }
@@ -206,7 +210,7 @@ class BitmapCanvas {
         }
     }
     
-    func fill(p:NSPoint, color rawNewColor_:ConvertibleToNSColor) {
+    func fill(_ p:NSPoint, color rawNewColor_:ConvertibleToNSColor) {
         // floodFillScanlineStack from http://lodev.org/cgtutor/floodfill.html
         
         let rawNewColor = rawNewColor_.color
@@ -214,9 +218,11 @@ class BitmapCanvas {
         assert(p.x < width, "p.x \(p.x) out of range, must be < \(width)")
         assert(p.y < height, "p.y \(p.y) out of range, must be < \(height)")
         
-        let pixelBuffer = UnsafeMutablePointer<UInt8>(CGBitmapContextGetData(cgContext))
+        guard let data = cgContext.data else { assertionFailure(); return }
+
+        let pixelBuffer = data.assumingMemoryBound(to: UInt8.self)
         
-        guard let newColor = rawNewColor.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) else {
+        guard let newColor = rawNewColor.usingColorSpaceName(NSCalibratedRGBColorSpace) else {
             print("-- cannot normalize color \(rawNewColor)")
             return
         }
@@ -242,10 +248,10 @@ class BitmapCanvas {
             var x1 = pp.x
             
             while(x1 >= 0 && _color(P(x1, pp.y), pixelBuffer:pixelBuffer) == oldColor) {
-                x1--
+                x1 -= 1
             }
             
-            x1++
+            x1 += 1
             
             var spanAbove = false
             var spanBelow = false
@@ -269,33 +275,33 @@ class BitmapCanvas {
                     spanBelow = false
                 }
                 
-                x1++
+                x1 += 1
             }
         }
     }
     
-    func line(p1:NSPoint, _ p2:NSPoint, _ color_:ConvertibleToNSColor? = NSColor.blackColor()) {
+    func line(_ p1:NSPoint, _ p2:NSPoint, _ color_:ConvertibleToNSColor? = NSColor.black) {
         
         let color = color_?.color
         
         context.saveGraphicsState()
         
         // align to the pixel grid
-        CGContextTranslateCTM(cgContext, 0.5, 0.5)
+        cgContext.translateBy(x: 0.5, y: 0.5)
         
         if let existingColor = color {
-            CGContextSetStrokeColorWithColor(cgContext, existingColor.CGColor);
+            cgContext.setStrokeColor(existingColor.cgColor);
         }
         
-        CGContextSetLineCap(cgContext, .Square)
-        CGContextMoveToPoint(cgContext, p1.x, p1.y)
-        CGContextAddLineToPoint(cgContext, p2.x, p2.y)
-        CGContextStrokePath(cgContext)
+        cgContext.setLineCap(.square)
+        cgContext.move(to: CGPoint(x: p1.x, y: p1.y))
+        cgContext.addLine(to: CGPoint(x: p2.x, y: p2.y))
+        cgContext.strokePath()
         
         context.restoreGraphicsState()
     }
 
-    func line(p1:NSPoint, length:CGFloat = 1.0, degreesCW:CGFloat = 0.0, _ color_:ConvertibleToNSColor? = NSColor.blackColor()) -> NSPoint {
+    func line(_ p1:NSPoint, length:CGFloat = 1.0, degreesCW:CGFloat = 0.0, _ color_:ConvertibleToNSColor? = NSColor.black) -> NSPoint {
         let color = color_?.color
         let radians = degreesToRadians(degreesCW)
         let p2 = P(p1.x + sin(radians) * length, p1.y - cos(radians) * length)
@@ -303,25 +309,25 @@ class BitmapCanvas {
         return p2
     }
 
-    func lineVertical(p1:NSPoint, height:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
+    func lineVertical(_ p1:NSPoint, height:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
         let color = color_?.color
         let p2 = P(p1.x, p1.y + height - 1)
         self.line(p1, p2, color)
     }
     
-    func lineHorizontal(p1:NSPoint, width:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
+    func lineHorizontal(_ p1:NSPoint, width:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
         let color = color_?.color
         let p2 = P(p1.x + width - 1, p1.y)
         self.line(p1, p2, color)
     }
     
-    func line(p1:NSPoint, deltaX:CGFloat, deltaY:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
+    func line(_ p1:NSPoint, deltaX:CGFloat, deltaY:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
         let color = color_?.color
         let p2 = P(p1.x + deltaX, p1.y + deltaY)
         self.line(p1, p2, color)
     }
     
-    func rectangle(rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {
+    func rectangle(_ rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.black, fill fill_:ConvertibleToNSColor? = nil) {
         
         let stroke = stroke_?.color
         let fill = fill_?.color
@@ -329,22 +335,22 @@ class BitmapCanvas {
         context.saveGraphicsState()
         
         // align to the pixel grid
-        CGContextTranslateCTM(cgContext, 0.5, 0.5)
+        cgContext.translateBy(x: 0.5, y: 0.5)
         
         if let existingFillColor = fill {
             existingFillColor.setFill()
-            NSBezierPath.fillRect(rect)
+            NSBezierPath.fill(rect)
         }
         
         if let existingStrokeColor = stroke {
             existingStrokeColor.setStroke()
-            NSBezierPath.strokeRect(rect)
+            NSBezierPath.stroke(rect)
         }
         
         context.restoreGraphicsState()
     }
     
-    func polygon(points:[NSPoint], stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), lineWidth:CGFloat=1.0, fill fill_:ConvertibleToNSColor? = nil) {
+    func polygon(_ points:[NSPoint], stroke stroke_:ConvertibleToNSColor? = NSColor.black, lineWidth:CGFloat=1.0, fill fill_:ConvertibleToNSColor? = nil) {
         
         guard points.count >= 3 else {
             assertionFailure("at least 3 points are needed")
@@ -355,10 +361,10 @@ class BitmapCanvas {
         
         let path = NSBezierPath()
         
-        path.moveToPoint(points[0])
+        path.move(to: points[0])
         
         for i in 1...points.count-1 {
-            path.lineToPoint(points[i])
+            path.line(to: points[i])
         }
         
         if let existingFillColor = fill_?.color {
@@ -366,7 +372,7 @@ class BitmapCanvas {
             path.fill()
         }
         
-        path.closePath()
+        path.close()
         
         if let existingStrokeColor = stroke_?.color {
             existingStrokeColor.setStroke()
@@ -377,7 +383,7 @@ class BitmapCanvas {
         context.restoreGraphicsState()
     }
     
-    func ellipse(rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.blackColor(), fill fill_:ConvertibleToNSColor? = nil) {
+    func ellipse(_ rect:NSRect, stroke stroke_:ConvertibleToNSColor? = NSColor.black, fill fill_:ConvertibleToNSColor? = nil) {
         
         let strokeColor = stroke_?.color
         let fillColor = fill_?.color
@@ -385,7 +391,7 @@ class BitmapCanvas {
         context.saveGraphicsState()
         
         // align to the pixel grid
-        CGContextTranslateCTM(cgContext, 0.5, 0.5)
+        cgContext.translateBy(x: 0.5, y: 0.5)
         
         // fill
         if let existingFillColor = fillColor {
@@ -393,39 +399,41 @@ class BitmapCanvas {
             
             // reduce fillRect so that is doesn't cross the stoke
             let fillRect = R(rect.origin.x+1, rect.origin.y+1, rect.size.width-2, rect.size.height-2)
-            CGContextFillEllipseInRect(cgContext, fillRect)
+            cgContext.fillEllipse(in: fillRect)
         }
         
         // stroke
         if let existingStrokeColor = strokeColor { existingStrokeColor.setStroke() }
-        CGContextStrokeEllipseInRect(cgContext, rect)
+        cgContext.strokeEllipse(in: rect)
         
         context.restoreGraphicsState()
     }
     
-    private func degreesToRadians(x:CGFloat) -> CGFloat {
+    fileprivate func degreesToRadians(_ x:CGFloat) -> CGFloat {
         return (M_PI * x / 180.0)
     }
     
-    func save(path:String, open:Bool=false) -> Bool {
-        guard let data = bitmapImageRep.representationUsingType(.NSPNGFileType, properties: [:]) else {
+    func save(_ path:String, open:Bool=false) {
+        guard let data = bitmapImageRep.representation(using: .PNG, properties: [:]) else {
             print("\(#file) \(#function) cannot get PNG data from bitmap")
-            return false
-        }
-        let success = data.writeToFile(path, atomically: false)
-        
-        if open {
-            NSWorkspace.sharedWorkspace().openFile(path)
+            return
         }
         
-        return success
+        do {
+            try data.write(to: URL(fileURLWithPath: path), options: [])
+            if open {
+                NSWorkspace.shared().openFile(path)
+            }
+        } catch let e {
+            print(e)
+        }
     }
     
-    static func textWidth(text:NSString, font:NSFont) -> CGFloat {
-        let maxSize : CGSize = CGSizeMake(CGFloat.max, font.pointSize)
-        let textRect : CGRect = text.boundingRectWithSize(
-            maxSize,
-            options: NSStringDrawingOptions.UsesLineFragmentOrigin,
+    static func textWidth(_ text:NSString, font:NSFont) -> CGFloat {
+        let maxSize : CGSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: font.pointSize)
+        let textRect : CGRect = text.boundingRect(
+            with: maxSize,
+            options: NSStringDrawingOptions.usesLineFragmentOrigin,
             attributes: [NSFontAttributeName: font],
             context: nil)
         return textRect.size.width
@@ -433,7 +441,7 @@ class BitmapCanvas {
     
     func image(fromPath path:String, _ p:NSPoint) {
         
-        guard let data = NSData(contentsOfFile:path) else {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
             print("\(#file) \(#function) cannot read data at \(path)");
             return
         }
@@ -443,24 +451,24 @@ class BitmapCanvas {
             return
         }
         
-        guard let cgImage = imgRep.CGImage else {
+        guard let cgImage = imgRep.cgImage else {
             print("\(#file) \(#function) cannot get cgImage out of imageRep from \(path)");
             return
         }
         
         context.saveGraphicsState()
         
-        CGContextScaleCTM(cgContext, 1.0, -1.0)
-        CGContextTranslateCTM(cgContext, 0.0, -2.0 * p.y - imgRep.pixelsHigh)
+        cgContext.scaleBy(x: 1.0, y: -1.0)
+        cgContext.translateBy(x: 0.0, y: -2.0 * p.y - imgRep.pixelsHigh)
         
         let rect = NSMakeRect(p.x, p.y, CGFloat(imgRep.pixelsWide), CGFloat(imgRep.pixelsHigh))
         
-        CGContextDrawImage(cgContext, rect, cgImage)
+        cgContext.draw(cgImage, in: rect)
         
         context.restoreGraphicsState()
     }
     
-    func text(text:String, _ p:NSPoint, rotationRadians:CGFloat?, font : NSFont = NSFont(name: "Monaco", size: 10)!, color color_ : ConvertibleToNSColor = NSColor.blackColor()) {
+    func text(_ text:String, _ p:NSPoint, rotationRadians:CGFloat?, font : NSFont = NSFont(name: "Monaco", size: 10)!, color color_ : ConvertibleToNSColor = NSColor.black) {
         
         let color = color_.color
         
@@ -472,20 +480,20 @@ class BitmapCanvas {
         context.saveGraphicsState()
         
         if let radians = rotationRadians {
-            CGContextTranslateCTM(cgContext, p.x, p.y);
-            CGContextRotateCTM(cgContext, radians)
-            CGContextTranslateCTM(cgContext, -p.x, -p.y);
+            cgContext.translateBy(x: p.x, y: p.y);
+            cgContext.rotate(by: radians)
+            cgContext.translateBy(x: -p.x, y: -p.y);
         }
         
-        CGContextScaleCTM(cgContext, 1.0, -1.0)
-        CGContextTranslateCTM(cgContext, 0.0, -2.0 * p.y - font.pointSize)
+        cgContext.scaleBy(x: 1.0, y: -1.0)
+        cgContext.translateBy(x: 0.0, y: -2.0 * p.y - font.pointSize)
         
-        text.drawAtPoint(p, withAttributes: attr)
+        text.draw(at: p, withAttributes: attr)
         
         context.restoreGraphicsState()
     }
     
-    func text(text:String, _ p:NSPoint, rotationDegrees degrees:CGFloat = 0.0, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : ConvertibleToNSColor = NSColor.blackColor()) {
+    func text(_ text:String, _ p:NSPoint, rotationDegrees degrees:CGFloat = 0.0, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : ConvertibleToNSColor = NSColor.black) {
         self.text(text, p, rotationRadians: degreesToRadians(degrees), font: font, color: color)
     }
 }

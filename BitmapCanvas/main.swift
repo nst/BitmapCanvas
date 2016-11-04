@@ -13,12 +13,12 @@ let PROJECT_PATH = "/Users/nst/Projects/BitmapCanvas"
 
 func switzerland() {
     
-    guard let resultsData = NSData(contentsOfFile: PROJECT_PATH+"/files/results.json") else { return }
-    guard let optResults = try? NSJSONSerialization.JSONObjectWithData(resultsData, options: []) as? [String:AnyObject] else { return }
+    guard let resultsData = try? Data(contentsOf: URL(fileURLWithPath: PROJECT_PATH+"/files/results.json")) else { return }
+    guard let optResults = try? JSONSerialization.jsonObject(with: resultsData, options: []) as? [String:AnyObject] else { return }
     guard let results = optResults else { return }
     
-    guard let switzerlandData = NSData(contentsOfFile: PROJECT_PATH+"/files/switzerland.json") else { return }
-    guard let optSwitzerland = try? NSJSONSerialization.JSONObjectWithData(switzerlandData, options: []) as? [String:AnyObject] else { return }
+    guard let switzerlandData = try? Data(contentsOf: URL(fileURLWithPath: PROJECT_PATH+"/files/switzerland.json")) else { return }
+    guard let optSwitzerland = try? JSONSerialization.jsonObject(with: switzerlandData, options: []) as? [String:AnyObject] else { return }
     guard let switzerland = optSwitzerland else { return }
     
     let b = BitmapCanvas(365, 235, "white")
@@ -32,11 +32,11 @@ func switzerland() {
     let positiveValues = values.filter { $0 >= 50.0 }
     let negativeValues = values.filter { $0 < 50.0 }
     
-    let minPositive = positiveValues.minElement() ?? 0.0
-    let maxPositive = positiveValues.maxElement() ?? 0.01
+    let minPositive = positiveValues.min() ?? 0.0
+    let maxPositive = positiveValues.max() ?? 0.01
     
-    let minNegative = negativeValues.minElement() ?? 0.0
-    let maxNegative = negativeValues.maxElement() ?? 0.01
+    let minNegative = negativeValues.min() ?? 0.0
+    let maxNegative = negativeValues.max() ?? 0.01
     
     let positiveRange = maxPositive - minPositive
     let negativeRange = maxNegative - minNegative
@@ -50,7 +50,7 @@ func switzerland() {
         
         // fill color
         
-        var fillColor = NSColor.lightGrayColor()
+        var fillColor = NSColor.lightGray
         if let percent = results[k] as? Double {
             if percent < 50.0 {
                 let i = ((percent - minNegative) / negativeRange) - 0.15
@@ -92,11 +92,11 @@ func points() {
     
     let b = BitmapCanvas(32, 32, "PapayaWhip")
     
-    b[1,1] = NSColor.blackColor()
+    b[1,1] = NSColor.black
     
     b[1,3] = "red"
     b[2,3] = "#00FF00"
-    b[3,3] = NSColor.blueColor()
+    b[3,3] = NSColor.blue
     
     b.save("/tmp/points.png")
 }
@@ -158,7 +158,7 @@ func text() {
     b.text("hello", P(20,30),
            rotationDegrees: -90,
            font: NSFont(name: "Helvetica", size: 10)!,
-           color: NSColor.redColor())
+           color: NSColor.red)
     
     b.save("/tmp/text.png")
 }
@@ -191,13 +191,13 @@ func bezier() {
     
     b.setAllowsAntialiasing(true)
     
-    NSColor.orangeColor().setFill()
+    NSColor.orange.setFill()
     
     let bp = NSBezierPath()
-    bp.moveToPoint(P(2,2))
-    bp.curveToPoint(P(20,14), controlPoint1: P(14,30), controlPoint2: P(15,30))
-    bp.curveToPoint(P(32,13), controlPoint1: P(24,14), controlPoint2: P(24,19))
-    bp.closePath()
+    bp.move(to: P(2,2))
+    bp.curve(to: P(20,14), controlPoint1: P(14,30), controlPoint2: P(15,30))
+    bp.curve(to: P(32,13), controlPoint1: P(24,14), controlPoint2: P(24,19))
+    bp.close()
     bp.fill()
     bp.stroke()
     
@@ -208,14 +208,14 @@ func cgContext() {
     
     let b = BitmapCanvas(32, 32, "PapayaWhip")
     
-    CGContextAddEllipseInRect(b.cgContext, R(2, 2, 24, 24))
-    CGContextStrokePath(b.cgContext)
+    b.cgContext.addEllipse(in: R(2, 2, 24, 24))
+    b.cgContext.strokePath()
     
     b.setAllowsAntialiasing(true)
     
-    CGContextSetStrokeColorWithColor(b.cgContext, NSColor.blueColor().CGColor)
-    CGContextAddEllipseInRect(b.cgContext, R(12, 12, 24, 24))
-    CGContextStrokePath(b.cgContext)
+    b.cgContext.setStrokeColor(NSColor.blue.cgColor)
+    b.cgContext.addEllipse(in: R(12, 12, 24, 24))
+    b.cgContext.strokePath()
     
     b.save("/tmp/cgcontext.png")
 }
@@ -253,7 +253,7 @@ func voronoi() {
     for x in 0..<w {
         for y in 0..<h {
             let distances = pointsColors.map { hypot($0.0.x - x, $0.0.y - y) }
-            b[x,y] = pointsColors[distances.indexOf(distances.minElement()!)!].1
+            b[x,y] = pointsColors[distances.index(of: distances.min()!)!].1
         }
     }
     
@@ -281,8 +281,8 @@ func piWalk() {
     let path = PROJECT_PATH+"/files/1000000.txt"
     
     guard let
-        data = NSFileManager.defaultManager().contentsAtPath(path),
-        s = NSString(data: data, encoding: NSASCIIStringEncoding) as? String else {
+        data = FileManager.default.contents(atPath: path),
+        let s = NSString(data: data, encoding: String.Encoding.ascii.rawValue) as? String else {
             assertionFailure(); return
     }
     
@@ -300,7 +300,7 @@ func piWalk() {
     
     // walk and draw
     
-    for (c, i) in ints.enumerate() {
+    for (c, i) in ints.enumerated() {
         let paletteIndex = Int(Double(c) / Double(ints.count) * Double(palette.count))
         let color = palette[paletteIndex]
         p = b.line(p, length:2, degreesCW:36.0 * i, color)
@@ -327,11 +327,11 @@ func piWalk() {
     
     let compassOrigin = P(legendPoint.x + 400, legendPoint.y + 600)
     b.context.saveGraphicsState()
-    CGContextSetLineWidth(b.cgContext, 10.0)
-    for degrees in 0.stride(to: 360, by: 36) {
+    b.cgContext.setLineWidth(10.0)
+    for degrees in stride(from: 0, to: 360, by: 36) {
         let p2 = b.line(compassOrigin, length:200, degreesCW:CGFloat(degrees), "white")
         b.text(String(Int(Double(degrees)/36.0)), P(p2.x, p2.y), rotationDegrees: CGFloat(degrees), font: font, color: "DarkGrey")
-        b.line(compassOrigin, length:140, degreesCW:CGFloat(degrees), "DarkGrey")
+        _ = b.line(compassOrigin, length:140, degreesCW:CGFloat(degrees), "DarkGrey")
     }
     b.context.restoreGraphicsState()
     
@@ -340,7 +340,7 @@ func piWalk() {
     let boxOrigin = P(legendPoint.x, legendPoint.y+1000)
     let boxWidth : CGFloat = 40.0
     let boxHeight : CGFloat = 20.0
-    for (i, color) in palette.enumerate() {
+    for (i, color) in palette.enumerated() {
         b.rectangle(R(legendPoint.x+Double(i)*boxWidth,legendPoint.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
     }
     
@@ -350,7 +350,7 @@ func piWalk() {
     let filename = (path as NSString).lastPathComponent
     b.text(filename, P(boxOrigin.x + 300, boxOrigin.y - 50), font: font, color: "DarkGrey")
     
-    b.save("/tmp/piwalk.png", open: true)
+    b.save("/Users/nst/Desktop/random.png", open: true)
 }
 
 switzerland()
@@ -372,8 +372,10 @@ voronoi()
 
 //piWalk()
 
-//let b = BitmapCanvas(6000,6000, "SkyBlue")
-//b.fill(P(270,243), color: NSColor.blueColor())
-//b.save("/tmp/out.png", open: true)
+/*
+let b = BitmapCanvas(6000,6000, "SkyBlue")
+b.fill(P(270,243), color: NSColor.blue)
+b.save("/tmp/out.png", open: true)
+*/
 
 //X11Colors.dump("/opt/X11/share/X11/rgb.txt", outPath:"/tmp/X11.clr")

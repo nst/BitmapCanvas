@@ -12,14 +12,14 @@ extension NSRegularExpression {
     class func findAll(string s: String, pattern: String) throws -> [String] {
         
         let regex = try NSRegularExpression(pattern: pattern, options: [])
-        let matches = regex.matchesInString(s, options: [], range: NSMakeRange(0, s.characters.count))
+        let matches = regex.matches(in: s, options: [], range: NSMakeRange(0, s.characters.count))
         
         var results : [String] = []
         
         for m in matches {
             for i in 1..<m.numberOfRanges {
-                let range = m.rangeAtIndex(i)
-                results.append((s as NSString).substringWithRange(range))
+                let range = m.rangeAt(i)
+                results.append((s as NSString).substring(with: range))
             }
         }
         
@@ -53,24 +53,24 @@ extension String : ConvertibleToNSColor {
     
     var color : NSColor {
         
-        let scanner = NSScanner(string: self)
+        let scanner = Scanner(string: self)
 
-        if scanner.scanString("#", intoString: nil) {
+        if scanner.scanString("#", into: nil) {
             var result : UInt32 = 0
-            if scanner.scanHexInt(&result) {
+            if scanner.scanHexInt32(&result) {
                 return result.color
             } else {
                 assertionFailure("cannot convert \(self) to hex color)")
-                return NSColor.clearColor()
+                return NSColor.clear
             }
         }
         
-        if let c = X11Colors.sharedInstance.colorList.colorWithKey(self.lowercaseString) {
+        if let c = X11Colors.sharedInstance.colorList.color(withKey: self.lowercased()) {
             return c
         }
         
         assertionFailure("cannot convert \(self) into color)")
-        return NSColor.clearColor()
+        return NSColor.clear
     }
 }
 
@@ -89,25 +89,25 @@ extension NSColor {
     }
 }
 
-func C(r:Int, _ g:Int, _ b:Int, _ a:Int = 255) -> NSColor {
+func C(_ r:Int, _ g:Int, _ b:Int, _ a:Int = 255) -> NSColor {
     return NSColor(r,g,b,a)
 }
 
-func C(r:CGFloat, _ g:CGFloat, _ b:CGFloat, _ a:CGFloat = 255.0) -> NSColor {
+func C(_ r:CGFloat, _ g:CGFloat, _ b:CGFloat, _ a:CGFloat = 255.0) -> NSColor {
     return NSColor(calibratedRed: r, green: g, blue: b, alpha: a)
 }
 
-struct X11Colors {
+class X11Colors {
 
-    static let sharedInstance = X11Colors(namePrettifier: { $0.lowercaseString })
+    static let sharedInstance = X11Colors(namePrettifier: { $0.lowercased() })
     
     var colorList = NSColorList(name: "X11")
     
-    init(path:String = "/opt/X11/share/X11/rgb.txt", namePrettifier:(original:String) -> (String)) {
+    init(path:String = "/opt/X11/share/X11/rgb.txt", namePrettifier:@escaping (_ original:String) -> (String)) {
         
-        let contents = try! String(contentsOfFile: path, encoding: NSUTF8StringEncoding)
+        let contents = try! String(contentsOfFile: path, encoding: String.Encoding.utf8)
         
-        contents.enumerateLines({ (line, stop) -> () in
+        contents.enumerateLines { (line, stop) in
             
             let pattern = "\\s?+(\\d+?)\\s+(\\d+?)\\s+(\\d+?)\\s+(\\w+)$"
             let matches = try! NSRegularExpression.findAll(string: line, pattern: pattern)
@@ -119,24 +119,24 @@ struct X11Colors {
             
             let name = matches[3]
             
-            let prettyName = namePrettifier(original:name)
+            let prettyName = namePrettifier(name)
             
             let color = NSColor(calibratedRed: r/255.0, green: g/255.0, blue: b/255.0, alpha: 1.0)
             self.colorList.setColor(color, forKey: prettyName)
             
             //print("\(name) \t -> \t \(prettyName)")
-        })
+        }
     }
     
-    static func dump(inPath:String, outPath:String) -> Bool {
+    static func dump(_ inPath:String, outPath:String) -> Bool {
         
         let x11Colors = X11Colors(namePrettifier: {
             let name = ($0 as NSString)
-            let firstCharacter = name.substringToIndex(1)
-            let restOfString = name.substringWithRange(NSMakeRange(1, name.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)-1))
-            return "\(firstCharacter.uppercaseString)\(restOfString)"
+            let firstCharacter = name.substring(to: 1)
+            let restOfString = name.substring(with: NSMakeRange(1, name.lengthOfBytes(using: String.Encoding.utf8.rawValue)-1))
+            return "\(firstCharacter.uppercased())\(restOfString)"
         })
         
-        return x11Colors.colorList.writeToFile(outPath)
+        return x11Colors.colorList.write(toFile: outPath)
     }
 }
