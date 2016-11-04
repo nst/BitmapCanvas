@@ -84,7 +84,7 @@ extension NSColor {
             alpha: CGFloat(a)/255.0)
     }
     
-    class func randomColor() -> NSColor {
+    class var randomColor : NSColor {
         return C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
     }
 }
