@@ -278,11 +278,11 @@ func walkAndDraw(width w:Int, height h:Int, walkOrigin:CGPoint, legendOrigin:CGP
     
     guard let
         data = FileManager.default.contents(atPath: digitsFilePath),
-        let s = NSString(data: data, encoding: String.Encoding.ascii.rawValue) as? String else {
+        let s = String(bytes: data, encoding: .ascii) else {
             assertionFailure(); return
     }
     
-    let ints = s.characters.flatMap { Int(String($0)) }
+    let ints = s.flatMap { Int(String($0)) }
     
     // setup colors + origin
     

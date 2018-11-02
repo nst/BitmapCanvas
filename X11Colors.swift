@@ -12,7 +12,7 @@ extension NSRegularExpression {
     class func findAll(string s: String, pattern: String) throws -> [String] {
         
         let regex = try NSRegularExpression(pattern: pattern, options: [])
-        let matches = regex.matches(in: s, options: [], range: NSMakeRange(0, s.characters.count))
+        let matches = regex.matches(in: s, options: [], range: NSMakeRange(0, s.count))
         
         var results : [String] = []
         

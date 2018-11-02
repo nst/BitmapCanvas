@@ -410,7 +410,7 @@ class BitmapCanvas {
     }
     
     fileprivate func degreesToRadians(_ x:CGFloat) -> CGFloat {
-        return (M_PI * x / 180.0)
+        return (Double.pi * x / 180.0)
     }
     
     func save(_ path:String, open:Bool=false) {
