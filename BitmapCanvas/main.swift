@@ -333,7 +333,7 @@ func walkAndDraw(width w:Int, height h:Int, walkOrigin:CGPoint, legendOrigin:CGP
     let boxOrigin = P(legendOrigin.x, legendOrigin.y+1000)
     let boxWidth : CGFloat = 40.0
     let boxHeight : CGFloat = 20.0
-
+    
     for (i, color) in palette.enumerated() {
         b.rectangle(R(legendOrigin.x+Double(i)*boxWidth,legendOrigin.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
     }
@@ -347,22 +347,63 @@ func walkAndDraw(width w:Int, height h:Int, walkOrigin:CGPoint, legendOrigin:CGP
     b.save(outFilePath, open: true)
 }
 
+func random01() -> Double {
+    return Double(arc4random()) / Double(UINT32_MAX)
+}
+
+func schotter() {
+    
+    // According to "Schotter" by Georg Nees
+    // https://collections.vam.ac.uk/item/O221321/schotter-print-nees-georg/
+    // Idea: randomness for x, y and rotation does increase at each row
+    
+    let COLS = 12
+    let ROWS = 24
+    let MARGIN = 40
+    let WIDTH = 30
+
+    let b = BitmapCanvas(COLS * WIDTH + MARGIN * 2, ROWS * WIDTH + MARGIN * 2 + 50, "white")
+    let c = b.cgContext
+
+    b.setAllowsAntialiasing(true)
+
+    for col in 0..<COLS {
+        for row in 0..<ROWS {
+
+            let origin = P(CGFloat(MARGIN + col * WIDTH), CGFloat(MARGIN + row * WIDTH))
+            let translateX = (origin.x + WIDTH / 2) + (random01() - 0.5) * row * 3
+            let translateY = (origin.y + WIDTH / 2) + (random01() - 0.5) * row * 3
+            let radians : CGFloat = (random01() - 0.5) * Double(row) / 10.0
+
+            c.saveGState()
+            c.translateBy(x: translateX, y: translateY)
+            c.rotate(by: radians)
+            c.translateBy(x: translateX * -1.0, y: translateY * -1.0)
+            b.rectangle(R(origin.x, origin.y, CGFloat(WIDTH), CGFloat(WIDTH)))
+            c.restoreGState()
+        }
+    }
+
+    b.save("/tmp/schotter.png")
+}
+
 //switzerland()
 
-bitmap()
-points()
-lines()
-rects()
-ellipse()
-fill()
-text()
-image()
-bezier()
-cgContext()
-polygon()
-
-gradient()
-voronoi()
+//bitmap()
+//points()
+//lines()
+//rects()
+//ellipse()
+//fill()
+//text()
+//image()
+//bezier()
+//cgContext()
+//polygon()
+//
+//gradient()
+//voronoi()
+schotter()
 
 // pi
 // https://www.angio.net/pi/digits.html
@@ -374,9 +415,9 @@ voronoi()
 //walkAndDraw(width:3900, height:4800, walkOrigin:P(1600,300), legendOrigin:P(300,300), digitsFilePath:PROJECT_PATH+"/files/e_2000000.txt", title:"e", outFilePath:"/tmp/e_walk.png")
 
 /*
-let b = BitmapCanvas(6000,6000, "SkyBlue")
-b.fill(P(270,243), color: NSColor.blue)
-b.save("/tmp/out.png", open: true)
-*/
+ let b = BitmapCanvas(6000,6000, "SkyBlue")
+ b.fill(P(270,243), color: NSColor.blue)
+ b.save("/tmp/out.png", open: true)
+ */
 
 //X11Colors.dump("/opt/X11/share/X11/rgb.txt", outPath:"/tmp/X11.clr")
