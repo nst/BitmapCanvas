@@ -206,6 +206,11 @@ b.save("/tmp/voronoi.png")
 
 Other pictures with source code in the project:
 
+Swift implementation of Nadieh Bremer's work ["Exploring the Art hidden in Pi"](http://www.visualcinnamon.com/2015/01/exploring-art-hidden-in-pi.html).
+
 ![pi walk](img/pi_walk.png "pi walk")
 
-Swift implementation of Nadieh Bremer's work ["Exploring the Art hidden in Pi"](http://www.visualcinnamon.com/2015/01/exploring-art-hidden-in-pi.html).
+["Schotter" by Georg Nees](https://collections.vam.ac.uk/item/O221321/schotter-print-nees-georg/) where the idea is that randomness for x, y and rotation does increase at each row.
+
+![schotter](img/schotter.png "schotter")
+
