@@ -54,7 +54,7 @@ extension String : ConvertibleToNSColor {
     var color : NSColor {
         
         let scanner = Scanner(string: self)
-
+        
         if scanner.scanString("#", into: nil) {
             var result : UInt32 = 0
             if scanner.scanHexInt32(&result) {
@@ -87,6 +87,16 @@ extension NSColor {
     class var randomColor : NSColor {
         return C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
     }
+    
+    class func rainbowColor(frequency: CGFloat = 0.25, step: Int, alpha: CGFloat = 255.0) -> NSColor {
+        let red = sin(frequency*CGFloat(step) + 0) * 127 + 128
+        let green = sin(frequency*CGFloat(step) + 2) * 127 + 128
+        let blue = sin(frequency*CGFloat(step) + 4) * 127 + 128
+        return NSColor(calibratedRed: red / 255.0,
+                       green: green / 255.0,
+                       blue: blue / 255.0,
+                       alpha: alpha / 255.0)
+    }
 }
 
 func C(_ r:Int, _ g:Int, _ b:Int, _ a:Int = 255) -> NSColor {
@@ -98,7 +108,7 @@ func C(_ r:CGFloat, _ g:CGFloat, _ b:CGFloat, _ a:CGFloat = 255.0) -> NSColor {
 }
 
 class X11Colors {
-
+    
     static let sharedInstance = X11Colors(namePrettifier: { $0.lowercased() })
     
     var colorList = NSColorList(name: "X11")
