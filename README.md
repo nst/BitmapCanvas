@@ -210,7 +210,8 @@ Swift implementation of Nadieh Bremer's work ["Exploring the Art hidden in Pi"](
 
 ![pi walk](img/pi_walk.png "pi walk")
 
-["Schotter" by Georg Nees](https://collections.vam.ac.uk/item/O221321/schotter-print-nees-georg/) where the idea is that randomness for x, y and rotation does increase at each row.
+["Schotter" by Georg Nees](https://collections.vam.ac.uk/item/O221321/schotter-print-nees-georg/) where the idea is that randomness for x, y and rotation does increase at each row. Also created a rainbow-colored version.
 
-![schotter](img/schotter.png "schotter")
+![schotter](img/schotter.png "schotter") ![schotter color](img/schotter_color.png "schotter color")
+
 
