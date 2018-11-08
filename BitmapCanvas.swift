@@ -413,6 +413,16 @@ class BitmapCanvas {
         return (Double.pi * x / 180.0)
     }
     
+    func rotate(center p: CGPoint, radians: CGFloat, closure: () -> ()) {
+        let c = self.cgContext
+        c.saveGState()
+        c.translateBy(x: p.x, y: p.y)
+        c.rotate(by: radians)
+        c.translateBy(x: p.x * -1.0, y: p.y * -1.0)
+        closure()
+        c.restoreGState()
+    }
+    
     func save(_ path:String, open:Bool=false) {
         guard let data = bitmapImageRep.representation(using: .PNG, properties: [:]) else {
             print("\(#file) \(#function) cannot get PNG data from bitmap")

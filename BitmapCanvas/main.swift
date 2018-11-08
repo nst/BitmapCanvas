@@ -361,30 +361,30 @@ func schotter() {
     let ROWS = 24
     let MARGIN = 80
     let WIDTH = 60
-
+    
     let b = BitmapCanvas(COLS * WIDTH + MARGIN * 2, ROWS * WIDTH + MARGIN * 2 + 50, "white")
-    let c = b.cgContext
-
+    
     b.setAllowsAntialiasing(true)
     
     for col in 0..<COLS {
         for row in 0..<ROWS {
             
             let origin = P(CGFloat(MARGIN + col * WIDTH), CGFloat(MARGIN + row * WIDTH))
-            let translateX = (origin.x + WIDTH / 2) + (random01() - 0.5) * row * 3
-            let translateY = (origin.y + WIDTH / 2) + (random01() - 0.5) * row * 3
             let radians : CGFloat = (random01() - 0.5) * Double(row) / 10.0
             let color = NSColor.rainbowColor(frequency: 0.3, step: row, alpha: 255 - row * 8)
-
-            c.saveGState()
-            c.translateBy(x: translateX, y: translateY)
-            c.rotate(by: radians)
-            c.translateBy(x: translateX * -1.0, y: translateY * -1.0)
-            b.rectangle(R(origin.x, origin.y, CGFloat(WIDTH), CGFloat(WIDTH)), fill: color)
-            c.restoreGState()
+            let center = CGPoint(x: origin.x + WIDTH / 2, y: origin.y + WIDTH / 2)
+            
+            b.rotate(center: center, radians: radians) {
+                let rect = R(origin.x + (random01() - 0.5) * row * 3,
+                             origin.y + (random01() - 0.5) * row * 3,
+                             CGFloat(WIDTH),
+                             CGFloat(WIDTH))
+                b.rectangle(rect, fill: color)
+            }
+            
         }
     }
-
+    
     b.save("/tmp/schotter_color.png", open: true)
 }
 
