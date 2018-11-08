@@ -27,7 +27,7 @@ func switzerland() {
     
     b.text("2016-02-28 \"Pas de spéculation sur les denrées alimentaires\"", P(5,220))
     
-    let values : [Double] = results.flatMap { (k,v) in v as? Double }
+    let values : [Double] = results.compactMap { (k,v) in v as? Double }
     
     let positiveValues = values.filter { $0 >= 50.0 }
     let negativeValues = values.filter { $0 < 50.0 }
@@ -282,7 +282,7 @@ func walkAndDraw(width w:Int, height h:Int, walkOrigin:CGPoint, legendOrigin:CGP
             assertionFailure(); return
     }
     
-    let ints = s.flatMap { Int(String($0)) }
+    let ints = s.compactMap { Int(String($0)) }
     
     // setup colors + origin
     

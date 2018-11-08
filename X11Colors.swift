@@ -18,7 +18,7 @@ extension NSRegularExpression {
         
         for m in matches {
             for i in 1..<m.numberOfRanges {
-                let range = m.rangeAt(i)
+                let range = m.range(at: i)
                 results.append((s as NSString).substring(with: range))
             }
         }
