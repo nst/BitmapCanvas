@@ -367,12 +367,12 @@ func schotter() {
             
             let origin = P(MARGIN + col * WIDTH + Double.random(in: -0.5...0.5) * Double(row) * 3,
                            MARGIN + row * WIDTH + Double.random(in: -0.5...0.5) * Double(row) * 3)
+            let rect = R(origin.x, origin.y, CGFloat(WIDTH), CGFloat(WIDTH))
+            let center = CGPoint(x: origin.x + WIDTH / 2, y: origin.y + WIDTH / 2)
             let radians = Double.random(in: -0.5...0.5) * CGFloat(row) / 10.0
             let color = NSColor.rainbowColor(frequency: 0.3, step: row, alpha: 255 - row * 8)
-            let center = CGPoint(x: origin.x + WIDTH / 2, y: origin.y + WIDTH / 2)
             
             b.rotate(center: center, radians: radians) {
-                let rect = R(origin.x, origin.y, CGFloat(WIDTH), CGFloat(WIDTH))
                 b.rectangle(rect, fill: color)
             }
         }
