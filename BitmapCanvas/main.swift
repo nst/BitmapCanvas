@@ -347,8 +347,8 @@ func walkAndDraw(width w:Int, height h:Int, walkOrigin:CGPoint, legendOrigin:CGP
     b.save(outFilePath, open: true)
 }
 
-func random01() -> Double {
-    return Double(arc4random()) / Double(UINT32_MAX)
+func random(_ min: Double, _ max: Double) -> Double {
+    return Double(arc4random()) / Double(UINT32_MAX) * (max - min) + min
 }
 
 func schotter() {
@@ -369,19 +369,16 @@ func schotter() {
     for col in 0..<COLS {
         for row in 0..<ROWS {
             
-            let origin = P(CGFloat(MARGIN + col * WIDTH), CGFloat(MARGIN + row * WIDTH))
-            let radians : CGFloat = (random01() - 0.5) * Double(row) / 10.0
+            let origin = P(MARGIN + col * WIDTH + random(-0.5, 0.5) * Double(row) * 3,
+                           MARGIN + row * WIDTH + random(-0.5, 0.5) * Double(row) * 3)
+            let radians = random(-0.5, 0.5) * CGFloat(row) / 10.0
             let color = NSColor.rainbowColor(frequency: 0.3, step: row, alpha: 255 - row * 8)
             let center = CGPoint(x: origin.x + WIDTH / 2, y: origin.y + WIDTH / 2)
             
             b.rotate(center: center, radians: radians) {
-                let rect = R(origin.x + (random01() - 0.5) * row * 3,
-                             origin.y + (random01() - 0.5) * row * 3,
-                             CGFloat(WIDTH),
-                             CGFloat(WIDTH))
+                let rect = R(origin.x, origin.y, CGFloat(WIDTH), CGFloat(WIDTH))
                 b.rectangle(rect, fill: color)
             }
-            
         }
     }
     
