@@ -424,7 +424,7 @@ class BitmapCanvas {
     }
     
     func save(_ path:String, open:Bool=false) {
-        guard let data = bitmapImageRep.representation(using: .png, properties: convertToNSBitmapImageRepPropertyKeyDictionary([:])) else {
+        guard let data = bitmapImageRep.representation(using: .png, properties: [:]) else {
             print("\(#file) \(#function) cannot get PNG data from bitmap")
             return
         }
@@ -444,7 +444,7 @@ class BitmapCanvas {
         let textRect : CGRect = text.boundingRect(
             with: maxSize,
             options: NSString.DrawingOptions.usesLineFragmentOrigin,
-            attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.font): font]),
+            attributes: [.font: font],
             context: nil)
         return textRect.size.width
     }
@@ -482,11 +482,6 @@ class BitmapCanvas {
         
         let color = color_.color
         
-        let attr = [
-            convertFromNSAttributedStringKey(NSAttributedString.Key.font):font,
-            convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor):color
-        ]
-        
         context.saveGraphicsState()
         
         if let radians = rotationRadians {
@@ -498,7 +493,7 @@ class BitmapCanvas {
         cgContext.scaleBy(x: 1.0, y: -1.0)
         cgContext.translateBy(x: 0.0, y: -2.0 * p.y - font.pointSize)
         
-        text.draw(at: p, withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attr))
+        text.draw(at: p, withAttributes: [.font: font, .foregroundColor: color])
         
         context.restoreGraphicsState()
     }
@@ -506,20 +501,4 @@ class BitmapCanvas {
     func text(_ text:String, _ p:NSPoint, rotationDegrees degrees:CGFloat = 0.0, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : ConvertibleToNSColor = NSColor.black) {
         self.text(text, p, rotationRadians: degreesToRadians(degrees), font: font, color: color)
     }
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToNSBitmapImageRepPropertyKeyDictionary(_ input: [String: Any]) -> [NSBitmapImageRep.PropertyKey: Any] {
-	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSBitmapImageRep.PropertyKey(rawValue: key), value)})
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
-	guard let input = input else { return nil }
-	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
-	return input.rawValue
 }
