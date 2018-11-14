@@ -8,68 +8,67 @@
 
 import Cocoa
 
+protocol GenericNumber {
+    var cgFloat: CGFloat { get }
+    var double: Double { get }
+}
+
+extension CGFloat: GenericNumber {
+    var cgFloat: CGFloat { return self }
+    var double: Double { return Double(self) }
+}
+
+extension Int: GenericNumber {
+    var cgFloat: CGFloat { return CGFloat(self) }
+    var double: Double { return Double(self) }
+}
+
+extension Double: GenericNumber {
+    var cgFloat: CGFloat { return CGFloat(self) }
+    var double: Double { return self }
+}
+
+extension Float: GenericNumber {
+    var cgFloat: CGFloat { return CGFloat(self) }
+    var double: Double { return Double(self) }
+}
+
+extension UInt32: GenericNumber {
+    var cgFloat: CGFloat { return CGFloat(self) }
+    var double: Double { return Double(self) }
+}
+
+func P<T: GenericNumber>(_ x:T, _ y:T) -> NSPoint {
+    return NSMakePoint(x.cgFloat, y.cgFloat)
+}
+
 infix operator * : MultiplicationPrecedence
 
-func *(left:CGFloat, right:Int) -> CGFloat
-{ return left * CGFloat(right) }
+func *(left:GenericNumber, right:GenericNumber) -> Double
+{ return left.double * right.double }
 
-func *(left:Int, right:CGFloat) -> CGFloat
-{ return CGFloat(left) * right }
+infix operator / : MultiplicationPrecedence
 
-func *(left:CGFloat, right:Double) -> CGFloat
-{ return left * CGFloat(right) }
-
-func *(left:Double, right:CGFloat) -> CGFloat
-{ return CGFloat(left) * right }
+func /(left:GenericNumber, right:GenericNumber) -> Double
+{ return left.double / right.double }
 
 infix operator + : AdditionPrecedence
 
-func +(left:CGFloat, right:Int) -> CGFloat
-{ return left + CGFloat(right) }
-
-func +(left:Int, right:CGFloat) -> CGFloat
-{ return CGFloat(left) + right }
-
-func +(left:CGFloat, right:Double) -> CGFloat
-{ return left + CGFloat(right) }
-
-func +(left:Double, right:CGFloat) -> CGFloat
-{ return CGFloat(left) + right }
+func +(left:GenericNumber, right:GenericNumber) -> Double
+{ return left.double + right.double }
 
 infix operator - : AdditionPrecedence
 
-func -(left:CGFloat, right:Int) -> CGFloat
-{ return left - CGFloat(right) }
-
-func -(left:Int, right:CGFloat) -> CGFloat
-{ return CGFloat(left) - right }
-
-func -(left:CGFloat, right:Double) -> CGFloat
-{ return left - CGFloat(right) }
-
-func -(left:Double, right:CGFloat) -> CGFloat
-{ return CGFloat(left) - right }
-
-//
-
-func P(_ x:CGFloat, _ y:CGFloat) -> NSPoint {
-    return NSMakePoint(x, y)
-}
-
-func P(_ x:Int, _ y:Int) -> NSPoint {
-    return NSMakePoint(CGFloat(x), CGFloat(y))
-}
+func -(left:GenericNumber, right:GenericNumber) -> Double
+{ return left.double - right.double }
 
 func RandomPoint(maxX:Int, maxY:Int) -> NSPoint {
-    return P(CGFloat(arc4random_uniform((UInt32(maxX+1)))), CGFloat(arc4random_uniform((UInt32(maxY+1)))))
+    
+    return P(arc4random_uniform(UInt32(maxX+1)), arc4random_uniform(UInt32(maxY+1)))
 }
 
-func R(_ x:CGFloat, _ y:CGFloat, _ w:CGFloat, _ h:CGFloat) -> NSRect {
-    return NSMakeRect(x, y, w, h)
-}
-
-func R(_ x:Int, _ y:Int, _ w:Int, _ h:Int) -> NSRect {
-    return NSMakeRect(CGFloat(x), CGFloat(y), CGFloat(w), CGFloat(h))
+func R<T: GenericNumber>(_ x:T, _ y:T, _ w:T, _ h:T) -> NSRect {
+    return NSMakeRect(x.cgFloat, y.cgFloat, w.cgFloat, h.cgFloat)
 }
 
 class BitmapCanvas {
@@ -191,7 +190,7 @@ class BitmapCanvas {
         }
         
         guard let data = cgContext.data else { assertionFailure(); return }
-
+        
         let pixelBuffer = data.assumingMemoryBound(to: UInt8.self)
         
         _setColor(p, pixelBuffer:pixelBuffer, normalizedColor:normalizedColor)
@@ -200,12 +199,12 @@ class BitmapCanvas {
     subscript(x:Int, y:Int) -> ConvertibleToNSColor {
         
         get {
-            let p = P(CGFloat(x),CGFloat(y))
+            let p = P(x, y)
             return color(p)
         }
         
         set {
-            let p = P(CGFloat(x),CGFloat(y))
+            let p = P(x, y)
             setColor(p, color:newValue)
         }
     }
@@ -219,7 +218,7 @@ class BitmapCanvas {
         assert(p.y < height, "p.y \(p.y) out of range, must be < \(height)")
         
         guard let data = cgContext.data else { assertionFailure(); return }
-
+        
         let pixelBuffer = data.assumingMemoryBound(to: UInt8.self)
         
         guard let newColor = rawNewColor.usingColorSpaceName(NSColorSpaceName.calibratedRGB) else {
@@ -280,7 +279,7 @@ class BitmapCanvas {
         }
     }
     
-    func line(_ p1:NSPoint, _ p2:NSPoint, _ color_:ConvertibleToNSColor? = NSColor.black) {
+    func line(_ p1: NSPoint, _ p2: NSPoint, _ color_: ConvertibleToNSColor? = NSColor.black) {
         
         let color = color_?.color
         
@@ -300,28 +299,29 @@ class BitmapCanvas {
         
         context.restoreGraphicsState()
     }
-
-    func line(_ p1:NSPoint, length:CGFloat = 1.0, degreesCW:CGFloat = 0.0, _ color_:ConvertibleToNSColor? = NSColor.black) -> NSPoint {
+    
+    func line(_ p1: NSPoint, length: GenericNumber = 1.0, degreesCW: GenericNumber = 0.0, _ color_: ConvertibleToNSColor? = NSColor.black) -> NSPoint {
         let color = color_?.color
-        let radians = degreesToRadians(degreesCW)
-        let p2 = P(p1.x + sin(radians) * length, p1.y - cos(radians) * length)
+        let radians = degreesToRadians(degreesCW.double)
+        let p2 = P(p1.x + sin(radians) * length.cgFloat, p1.y
+            - cos(radians) * length.cgFloat)
         self.line(p1, p2, color)
         return p2
     }
-
-    func lineVertical(_ p1:NSPoint, height:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
+    
+    func lineVertical(_ p1: NSPoint, height: Double, _ color_: ConvertibleToNSColor? = nil) {
         let color = color_?.color
-        let p2 = P(p1.x, p1.y + height - 1)
+        let p2 = P(p1.x, p1.y + CGFloat(height - 1))
         self.line(p1, p2, color)
     }
     
-    func lineHorizontal(_ p1:NSPoint, width:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
+    func lineHorizontal(_ p1:NSPoint, width: Double, _ color_: ConvertibleToNSColor? = nil) {
         let color = color_?.color
-        let p2 = P(p1.x + width - 1, p1.y)
+        let p2 = P(p1.x + width - 1, p1.y.double)
         self.line(p1, p2, color)
     }
     
-    func line(_ p1:NSPoint, deltaX:CGFloat, deltaY:CGFloat, _ color_:ConvertibleToNSColor? = nil) {
+    func line(_ p1: NSPoint, deltaX: Double, deltaY: Double, _ color_: ConvertibleToNSColor? = nil) {
         let color = color_?.color
         let p2 = P(p1.x + deltaX, p1.y + deltaY)
         self.line(p1, p2, color)
@@ -409,15 +409,15 @@ class BitmapCanvas {
         context.restoreGraphicsState()
     }
     
-    fileprivate func degreesToRadians(_ x:CGFloat) -> CGFloat {
+    fileprivate func degreesToRadians(_ x:GenericNumber) -> Double {
         return (Double.pi * x / 180.0)
     }
     
-    func rotate(center p: CGPoint, radians: CGFloat, closure: () -> ()) {
+    func rotate(center p: CGPoint, radians: GenericNumber, closure: () -> ()) {
         let c = self.cgContext
         c.saveGState()
         c.translateBy(x: p.x, y: p.y)
-        c.rotate(by: radians)
+        c.rotate(by: radians.cgFloat)
         c.translateBy(x: p.x * -1.0, y: p.y * -1.0)
         closure()
         c.restoreGState()
@@ -469,16 +469,16 @@ class BitmapCanvas {
         context.saveGraphicsState()
         
         cgContext.scaleBy(x: 1.0, y: -1.0)
-        cgContext.translateBy(x: 0.0, y: -2.0 * p.y - imgRep.pixelsHigh)
+        cgContext.translateBy(x: 0.0, y: -2.0 * p.y - imgRep.pixelsHigh.cgFloat)
         
-        let rect = NSMakeRect(p.x, p.y, CGFloat(imgRep.pixelsWide), CGFloat(imgRep.pixelsHigh))
+        let rect = NSMakeRect(p.x, p.y, imgRep.pixelsWide.cgFloat, imgRep.pixelsHigh.cgFloat)
         
         cgContext.draw(cgImage, in: rect)
         
         context.restoreGraphicsState()
     }
     
-    func text(_ text:String, _ p:NSPoint, rotationRadians:CGFloat?, font : NSFont = NSFont(name: "Monaco", size: 10)!, color color_ : ConvertibleToNSColor = NSColor.black) {
+    func text(_ text: String, _ p: NSPoint, rotationRadians: GenericNumber?, font: NSFont = NSFont(name: "Monaco", size: 10)!, color color_ : ConvertibleToNSColor = NSColor.black) {
         
         let color = color_.color
         
@@ -486,7 +486,7 @@ class BitmapCanvas {
         
         if let radians = rotationRadians {
             cgContext.translateBy(x: p.x, y: p.y);
-            cgContext.rotate(by: radians)
+            cgContext.rotate(by: radians.cgFloat)
             cgContext.translateBy(x: -p.x, y: -p.y);
         }
         
@@ -498,7 +498,7 @@ class BitmapCanvas {
         context.restoreGraphicsState()
     }
     
-    func text(_ text:String, _ p:NSPoint, rotationDegrees degrees:CGFloat = 0.0, font : NSFont = NSFont(name: "Monaco", size: 10)!, color : ConvertibleToNSColor = NSColor.black) {
+    func text(_ text: String, _ p: NSPoint, rotationDegrees degrees: GenericNumber = 0.0, font: NSFont = NSFont(name: "Monaco", size: 10)!, color: ConvertibleToNSColor = NSColor.black) {
         self.text(text, p, rotationRadians: degreesToRadians(degrees), font: font, color: color)
     }
 }

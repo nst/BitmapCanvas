@@ -17,7 +17,7 @@ func switzerland() {
     guard let optResults = try? JSONSerialization.jsonObject(with: resultsData, options: []) as? [String:AnyObject] else { return }
     guard let results = optResults else { return }
     
-    guard let switzerlandData = try? Data(contentsOf: URL(fileURLWithPath: PROJECT_PATH+"/files/switzerland.json")) else { return }
+    guard let switzerlandData = try? Data(contentsOf: URL(fileURLWithPath: PROJECT_PATH + "/files/switzerland.json")) else { return }
     guard let optSwitzerland = try? JSONSerialization.jsonObject(with: switzerlandData, options: []) as? [String:AnyObject] else { return }
     guard let switzerland = optSwitzerland else { return }
     
@@ -50,14 +50,14 @@ func switzerland() {
         
         // fill color
         
-        var fillColor = NSColor.lightGray
+        var fillColor: NSColor = .lightGray
         if let percent = results[k] as? Double {
             if percent < 50.0 {
-                let i = ((percent - minNegative) / negativeRange) - 0.15
-                fillColor = NSColor(calibratedRed: 1.0, green: CGFloat(i), blue: CGFloat(i), alpha: 1.0)
+                let i: Double = ((percent - minNegative) / negativeRange) - 0.15
+                fillColor = NSColor(calibratedRed: 1.0, green: CGFloat(i), blue: i.cgFloat, alpha: 1.0)
             } else {
-                let i = (1.0 - (percent - minPositive) / positiveRange) - 0.15
-                fillColor = NSColor(calibratedRed: CGFloat(i), green: 1.0, blue: CGFloat(i), alpha: 1.0)
+                let i: Double = (1.0 - (percent - minPositive) / positiveRange) - 0.15
+                fillColor = NSColor(calibratedRed: i.cgFloat, green: 1.0, blue: CGFloat(i), alpha: 1.0)
             }
         }
         
@@ -322,26 +322,26 @@ func walkAndDraw(width w:Int, height h:Int, walkOrigin:CGPoint, legendOrigin:CGP
     b.context.saveGraphicsState()
     b.cgContext.setLineWidth(10.0)
     for degrees in stride(from: 0, to: 360, by: 36) {
-        let p2 = b.line(compassOrigin, length:200, degreesCW:CGFloat(degrees), "white")
-        b.text(String(Int(Double(degrees)/36.0)), P(p2.x, p2.y), rotationDegrees: CGFloat(degrees), font: font, color: "DarkGrey")
-        _ = b.line(compassOrigin, length:140, degreesCW:CGFloat(degrees), "DarkGrey")
+        let p2 = b.line(compassOrigin, length: 200, degreesCW: degrees, "white")
+        b.text(String(Int(degrees/36.0)), P(p2.x, p2.y), rotationDegrees: degrees, font: font, color: "DarkGrey")
+        _ = b.line(compassOrigin, length:140, degreesCW:degrees, "DarkGrey")
     }
     b.context.restoreGraphicsState()
     
     // legend - color scale
     
     let boxOrigin = P(legendOrigin.x, legendOrigin.y+1000)
-    let boxWidth : CGFloat = 40.0
-    let boxHeight : CGFloat = 20.0
+    let boxWidth = 40.0
+    let boxHeight = 20.0
     
     for (i, color) in palette.enumerated() {
-        b.rectangle(R(legendOrigin.x+Double(i)*boxWidth,legendOrigin.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
+    b.rectangle(R(legendOrigin.x+Double(i)*boxWidth,legendOrigin.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
     }
     
     b.text("start", P(boxOrigin.x, boxOrigin.y - 50), font: font, color: "DarkGrey")
-    b.text("end", P(boxOrigin.x + boxWidth * palette.count - 60, boxOrigin.y - 50), font: font, color: "DarkGrey")
+    b.text("end", P(boxOrigin.x + boxWidth * palette.count - 60.0, boxOrigin.y - 50), font: font, color: "DarkGrey")
     
-    let filename = (digitsFilePath as NSString).lastPathComponent
+    let filename = URL(fileURLWithPath: digitsFilePath).lastPathComponent
     b.text(filename, P(boxOrigin.x + 300, boxOrigin.y - 50), font: font, color: "DarkGrey")
     
     b.save(outFilePath, open: true)
@@ -365,11 +365,12 @@ func schotter() {
     for col in 0..<COLS {
         for row in 0..<ROWS {
             
-            let origin = P(MARGIN + col * WIDTH + Double.random(in: -0.5...0.5) * Double(row) * 3,
-                           MARGIN + row * WIDTH + Double.random(in: -0.5...0.5) * Double(row) * 3)
+            let x = MARGIN + col * WIDTH + Double.random(in: -0.5...0.5) * row * 3
+            let y = MARGIN + row * WIDTH + Double.random(in: -0.5...0.5) * row * 3
+            let origin = P(x, y)
             let rect = R(origin.x, origin.y, CGFloat(WIDTH), CGFloat(WIDTH))
             let center = CGPoint(x: origin.x + WIDTH / 2, y: origin.y + WIDTH / 2)
-            let radians = Double.random(in: -0.5...0.5) * CGFloat(row) / 10.0
+            let radians = Double.random(in: -0.5...0.5) * row / 10.0
             let color = NSColor.rainbowColor(frequency: 0.3, step: row, alpha: 255 - row * 8)
             
             b.rotate(center: center, radians: radians) {

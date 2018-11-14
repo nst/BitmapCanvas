@@ -41,11 +41,11 @@ extension UInt32 : ConvertibleToNSColor {
     
     var color : NSColor {
         
-        let r = CGFloat((self >> 16) & 0xff) / 255
-        let g = CGFloat((self >> 08) & 0xff) / 255
-        let b = CGFloat((self >> 00) & 0xff) / 255
+        let r = Double((self >> 16) & 0xff) / 255.0
+        let g = Double((self >> 08) & 0xff) / 255.0
+        let b = Double((self >> 00) & 0xff) / 255.0
         
-        return NSColor(calibratedRed:r, green:g, blue:b, alpha:1.0)
+        return NSColor(calibratedRed:r.cgFloat, green:g.cgFloat, blue:b.cgFloat, alpha:1.0)
     }
 }
 
@@ -88,14 +88,14 @@ extension NSColor {
         return C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
     }
     
-    class func rainbowColor(frequency: CGFloat = 0.25, step: Int, alpha: CGFloat = 255.0) -> NSColor {
-        let red = sin(frequency*CGFloat(step) + 0) * 127 + 128
-        let green = sin(frequency*CGFloat(step) + 2) * 127 + 128
-        let blue = sin(frequency*CGFloat(step) + 4) * 127 + 128
-        return NSColor(calibratedRed: red / 255.0,
-                       green: green / 255.0,
-                       blue: blue / 255.0,
-                       alpha: alpha / 255.0)
+    class func rainbowColor(frequency: Double = 0.25, step: Int, alpha: Double = 255.0) -> NSColor {
+        let red = sin(frequency*step + 0) * 127 + 128
+        let green = sin(frequency*step + 2) * 127 + 128
+        let blue = sin(frequency*step + 4) * 127 + 128
+        return NSColor(calibratedRed: CGFloat(red / 255.0),
+                       green: CGFloat(green / 255.0),
+                       blue: CGFloat(blue / 255.0),
+                       alpha: CGFloat(alpha / 255.0))
     }
 }
 
