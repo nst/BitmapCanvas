@@ -88,14 +88,17 @@ extension NSColor {
         return C(Int(arc4random_uniform(256)), Int(arc4random_uniform(256)), Int(arc4random_uniform(256)))
     }
     
-    class func rainbowColor(frequency: Double = 0.25, step: Int, alpha: Double = 255.0) -> NSColor {
-        let red = sin(frequency*step + 0) * 127 + 128
-        let green = sin(frequency*step + 2) * 127 + 128
-        let blue = sin(frequency*step + 4) * 127 + 128
-        return NSColor(calibratedRed: CGFloat(red / 255.0),
-                       green: CGFloat(green / 255.0),
-                       blue: CGFloat(blue / 255.0),
-                       alpha: CGFloat(alpha / 255.0))
+    class func rainbowColor(offset: Double = 0.0, percent pct: Double = 0.0, alpha: Double = 1.0) -> NSColor {
+        let red = sin(2 * Double.pi * (offset + pct) + 0) * 0.5 + 0.5
+        let green = sin(2 * Double.pi * (offset + pct) + 2) * 0.5 + 0.5
+        let blue = sin(2 * Double.pi * (offset + pct) + 4) * 0.5 + 0.5
+        
+        return NSColor(
+            calibratedRed: red.cgFloat,
+            green: green.cgFloat,
+            blue: blue.cgFloat,
+            alpha: alpha.cgFloat
+        )
     }
 }
 
