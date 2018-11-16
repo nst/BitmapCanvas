@@ -335,7 +335,7 @@ func walkAndDraw(width w:Int, height h:Int, walkOrigin:CGPoint, legendOrigin:CGP
     let boxHeight = 20.0
     
     for (i, color) in palette.enumerated() {
-    b.rectangle(R(legendOrigin.x+Double(i)*boxWidth,legendOrigin.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
+        b.rectangle(R(legendOrigin.x+Double(i)*boxWidth,legendOrigin.y+1000,boxWidth,boxHeight), stroke: color, fill: color)
     }
     
     b.text("start", P(boxOrigin.x, boxOrigin.y - 50), font: font, color: "DarkGrey")
@@ -386,6 +386,32 @@ func schotter() {
     b.save("/tmp/schotter_color.png", open: true)
 }
 
+func rainbowFall() {
+    
+    let b = BitmapCanvas(800, 600, "black")
+    
+    for col in 0..<Int(b.width) {
+        
+        let y = Double.random(in: 0.0...Double(b.height))
+        
+        let color = NSColor.rainbowColor(offset: 0.25, percent: b.width - col / b.width, alpha: Double.random(in: 0.5...1.0))
+        
+        guard let g = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                                 colors: ["black".color.cgColor, color.cgColor] as CFArray,
+                                 locations: [0.0, 1.0]) else { assertionFailure(); return }
+        
+        b.cgContext.saveGState()
+        
+        b.cgContext.addRect(R(col, 0, 1, Int(y)))
+        b.cgContext.clip()
+        b.cgContext.drawLinearGradient(g, start: P(col, 0), end: P(Double(col), y), options: [])
+        
+        b.cgContext.restoreGState()
+    }
+    
+    b.save("/tmp/rainbow_fall.png", open: true)
+}
+
 //switzerland()
 
 //bitmap()
@@ -402,7 +428,8 @@ func schotter() {
 //
 //gradient()
 //voronoi()
-schotter()
+//schotter()
+rainbowFall()
 
 // pi
 // https://www.angio.net/pi/digits.html
