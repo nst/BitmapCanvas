@@ -214,4 +214,4 @@ Swift implementation of Nadieh Bremer's work ["Exploring the Art hidden in Pi"](
 
 <img src="img/schotter.png" alt="schotter" width="400" /> <img src="img/schotter_color.png" alt="schotter color" width="400" />
 
-![pi walk](img/rainbow_fall.png "rainbow fall")
+<img src="img/rainbow_fall.png" alt="rainbow fall" width="800" />
